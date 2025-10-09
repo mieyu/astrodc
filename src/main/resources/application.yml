@@ -1,0 +1,35 @@
+spring:
+  servlet:
+    http:
+      encoding:
+        charset: UTF-8
+        enabled: true
+        force: true  # 强制所有请求/响应使用UTF-8编码（避免中文乱码）
+    multipart:
+      max-file-size: 100MB   # 单个文件上传大小限制（100MB）
+      max-request-size: 100MB # 单次请求总文件大小限制（100MB，需≥max-file-size）
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/observation_image?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowPublicKeyRetrieval=true
+    # 新增 allowPublicKeyRetrieval=true，允许驱动检索MySQL公钥，解决连接错误
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver # MySQL 8.0+ 必须使用此驱动类（旧版com.mysql.jdbc.Driver已废弃）
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true # 开启“下划线命名”与“驼峰命名”自动映射（如user_name→userName）
+  # 建议补充mapper扫描路径（避免XML文件找不到）
+  mapper-locations: classpath:mapper/**/*.xml # 若你的Mapper XML在src/main/resources/mapper目录下
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true # 与spring.servlet.http.encoding作用一致，确保编码统一（可保留或删除其一，建议保留避免冲突）
+  port: 8088 # 项目启动端口（无冲突可保留）
+
+file:
+  root-path: /media/miemieyu/work/Observated_images # 文件存储根路径（Linux环境）
+  # root-path: /Volumes/work/Observated_images # Mac环境路径（注释备用）
