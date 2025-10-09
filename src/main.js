@@ -1,0 +1,21 @@
+import Vue from 'vue'
+import App from './App.vue'
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
+import axios from 'axios'
+import router from './router' // 导入路由
+
+Vue.config.productionTip = false
+Vue.use(ElementUI)
+
+// 本地访问接口
+// axios.defaults.baseURL = 'http://127.0.0.1:8088'
+
+
+// 远程访问接口
+axios.defaults.baseURL = 'http://100.122.113.22:8089'
+
+new Vue({
+    router, // 在Vue实例中注册路由
+    render: h => h(App),
+}).$mount('#app')
