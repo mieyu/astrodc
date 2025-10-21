@@ -28,7 +28,7 @@ server:
       charset: UTF-8
       enabled: true
       force: true # 与spring.servlet.http.encoding作用一致，确保编码统一（可保留或删除其一，建议保留避免冲突）
-  port: 8088 # 项目启动端口
+  port: 8088mvn # 项目启动端口
 
 file:
   root-path: /media/miemieyu/work/Observated_images # 文件存储根路径（Linux环境）
