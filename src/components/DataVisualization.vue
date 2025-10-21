@@ -7,7 +7,7 @@
 
     <!-- 数据可视化内容区域 -->
     <div class="visualization-content">
-      <!-- 左侧：分类统计模块 -->
+      <!-- 左侧:分类统计模块 -->
       <div class="left-panel">
         <div class="panel-header">
           <h3><i class="el-icon-pie-chart"></i> 分类统计</h3>
@@ -15,27 +15,17 @@
         </div>
         <div class="stats-container">
           <div class="stat-item">
-            <div class="stat-label">图像类型</div>
-            <div class="stat-chart">
-              <div class="chart-placeholder">
-                <i class="el-icon-pie-chart"></i>
-                <span>饼图展示</span>
-              </div>
-            </div>
+            <div class="stat-label">图像类型分布</div>
+            <div class="stat-chart" ref="imageTypeChart"></div>
           </div>
           <div class="stat-item">
-            <div class="stat-label">观测目标</div>
-            <div class="stat-chart">
-              <div class="chart-placeholder">
-                <i class="el-icon-s-data"></i>
-                <span>柱状图展示</span>
-              </div>
-            </div>
+            <div class="stat-label">观测目标分布</div>
+            <div class="stat-chart" ref="objectChart"></div>
           </div>
         </div>
       </div>
 
-      <!-- 右侧：年份统计模块 -->
+      <!-- 右侧:年份统计模块 -->
       <div class="right-panel">
         <div class="panel-header">
           <h3><i class="el-icon-trend-charts"></i> 年份统计</h3>
@@ -43,22 +33,12 @@
         </div>
         <div class="stats-container">
           <div class="stat-item">
-            <div class="stat-label">年度趋势</div>
-            <div class="stat-chart">
-              <div class="chart-placeholder">
-                <i class="el-icon-trend-charts"></i>
-                <span>折线图展示</span>
-              </div>
-            </div>
+            <div class="stat-label">年份趋势</div>
+            <div class="stat-chart" ref="yearChart"></div>
           </div>
           <div class="stat-item">
-            <div class="stat-label">月度分布</div>
-            <div class="stat-chart">
-              <div class="chart-placeholder">
-                <i class="el-icon-data-line"></i>
-                <span>面积图展示</span>
-              </div>
-            </div>
+            <div class="stat-label">月份分布</div>
+            <div class="stat-chart" ref="monthChart"></div>
           </div>
         </div>
       </div>
@@ -67,11 +47,266 @@
 </template>
 
 <script>
+import * as echarts from 'echarts';
+import axios from 'axios';
+
 export default {
   name: 'DataVisualization',
+  data() {
+    return {
+      charts: {
+        imageType: null,
+        object: null,
+        year: null,
+        month: null
+      }
+    };
+  },
+  mounted() {
+    this.loadStats();
+    window.addEventListener('resize', this.handleResize);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize);
+    Object.values(this.charts).forEach(chart => {
+      if (chart) chart.dispose();
+    });
+  },
   methods: {
     goBack() {
       this.$router.go(-1);
+    },
+    
+    
+    async loadStats() {
+      try {
+        const response = await axios.get(`${axios.defaults.baseURL}/observation/stats`);
+        if (response.data.code === 1) {
+          const stats = response.data.data;
+          this.initImageTypeChart(stats.imageType);
+          this.initObjectChart(stats.object);
+          this.initYearChart(stats.year);
+          this.initMonthChart(stats.month);
+        }
+      } catch (error) {
+        console.error('加载统计数据失败:', error);
+        this.$message.error('加载统计数据失败');
+      }
+    },
+
+    initImageTypeChart(data) {
+      const chartData = Object.entries(data).map(([name, value]) => ({
+        name,
+        value
+      }));
+
+      const chart = echarts.init(this.$refs.imageTypeChart);
+      const option = {
+        tooltip: {
+          trigger: 'item',
+          formatter: '{b}: {c} ({d}%)'
+        },
+        legend: {
+          orient: 'vertical',
+          right: 10,
+          top: 'center'
+        },
+        series: [
+          {
+            type: 'pie',
+            radius: ['40%', '70%'],
+            avoidLabelOverlap: false,
+            itemStyle: {
+              borderRadius: 10,
+              borderColor: '#fff',
+              borderWidth: 2
+            },
+            label: {
+              show: false,
+              position: 'center'
+            },
+            emphasis: {
+              label: {
+                show: true,
+                fontSize: 16,
+                fontWeight: 'bold'
+              }
+            },
+            labelLine: {
+              show: false
+            },
+            data: chartData
+          }
+        ]
+      };
+      chart.setOption(option);
+      this.charts.imageType = chart;
+    },
+
+    initObjectChart(data) {
+      // 只显示前10个最多的观测目标
+      const sortedData = Object.entries(data)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+
+      const chartData = sortedData.map(([name, value]) => ({
+        name,
+        value
+      }));
+
+      const chart = echarts.init(this.$refs.objectChart);
+      const option = {
+        tooltip: {
+          trigger: 'item',
+          formatter: '{b}: {c} ({d}%)'
+        },
+        legend: {
+          orient: 'vertical',
+          right: 10,
+          top: 'center',
+          type: 'scroll'
+        },
+        series: [
+          {
+            type: 'pie',
+            radius: ['40%', '70%'],
+            avoidLabelOverlap: false,
+            itemStyle: {
+              borderRadius: 10,
+              borderColor: '#fff',
+              borderWidth: 2
+            },
+            label: {
+              show: false,
+              position: 'center'
+            },
+            emphasis: {
+              label: {
+                show: true,
+                fontSize: 16,
+                fontWeight: 'bold'
+              }
+            },
+            labelLine: {
+              show: false
+            },
+            data: chartData
+          }
+        ]
+      };
+      chart.setOption(option);
+      this.charts.object = chart;
+    },
+
+    initYearChart(data) {
+      const years = Object.keys(data);
+      const values = Object.values(data);
+
+      const chart = echarts.init(this.$refs.yearChart);
+      const option = {
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          data: years,
+          axisLabel: {
+            rotate: 45
+          }
+        },
+        yAxis: {
+          type: 'value',
+          name: '观测次数'
+        },
+        series: [
+          {
+            type: 'bar',
+            data: values,
+            itemStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: '#83bff6' },
+                { offset: 0.5, color: '#188df0' },
+                { offset: 1, color: '#188df0' }
+              ])
+            },
+            emphasis: {
+              itemStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  { offset: 0, color: '#2378f7' },
+                  { offset: 0.7, color: '#2378f7' },
+                  { offset: 1, color: '#83bff6' }
+                ])
+              }
+            }
+          }
+        ]
+      };
+      chart.setOption(option);
+      this.charts.year = chart;
+    },
+
+    initMonthChart(data) {
+      const months = Object.keys(data);
+      const values = Object.values(data);
+
+      const chart = echarts.init(this.$refs.monthChart);
+      const option = {
+        tooltip: {
+          trigger: 'axis'
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: months
+        },
+        yAxis: {
+          type: 'value',
+          name: '观测次数'
+        },
+        series: [
+          {
+            type: 'line',
+            data: values,
+            smooth: true,
+            lineStyle: {
+              width: 3,
+              color: '#67C23A'
+            },
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: 'rgba(103, 194, 58, 0.3)' },
+                { offset: 1, color: 'rgba(103, 194, 58, 0.05)' }
+              ])
+            },
+            itemStyle: {
+              color: '#67C23A'
+            }
+          }
+        ]
+      };
+      chart.setOption(option);
+      this.charts.month = chart;
+    },
+
+    handleResize() {
+      Object.values(this.charts).forEach(chart => {
+        if (chart) chart.resize();
+      });
     }
   }
 };
@@ -174,28 +409,8 @@ export default {
 }
 
 .stat-chart {
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.chart-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  color: #c0c4cc;
-  font-size: 14px;
-}
-
-.chart-placeholder i {
-  font-size: 32px;
-  color: #409EFF;
-}
-
-.chart-placeholder span {
-  color: #909399;
+  height: 300px;
+  width: 100%;
 }
 
 /* 响应式设计 */
@@ -211,11 +426,7 @@ export default {
   }
   
   .stat-chart {
-    height: 100px;
-  }
-  
-  .chart-placeholder i {
-    font-size: 24px;
+    height: 250px;
   }
 }
 </style>
