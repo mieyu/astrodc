@@ -7,22 +7,33 @@
 
     <p>请将 FITS 文件拖拽到下方区域，或点击上传。</p>
 
-    <!-- 关键：使用自定义上传函数，忽略默认action -->
-    <el-upload
-        class="upload-area"
+    <!-- 文件上传区域 -->
+    <div class="upload-wrapper">
+      <el-upload
+        class="upload-dragger"
         drag
-        action="#"  <!-- action仅为占位，实际由customUpload处理 -->
-        :http-request="customUpload"  <!-- 自定义上传逻辑 -->
+        action="#"
+        :http-request="customUpload"
         :on-success="handleSuccess"
         :on-error="handleError"
         :before-upload="beforeUpload"
         :limit="1"
         :on-exceed="handleExceed"
+        :show-file-list="false"
         ref="upload">
-      <i class="el-icon-upload"></i>
-      <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-      <div class="el-upload__tip" slot="tip">只能上传fits或fit文件，显示原始头文件数据</div>
-    </el-upload>
+        <div class="upload-content">
+          <i class="el-icon-upload upload-icon"></i>
+          <div class="upload-text">
+            <p class="main-text">将 FITS 文件拖拽到此处</p>
+            <p class="sub-text">或 <span class="click-text">点击选择文件</span></p>
+          </div>
+          <div class="upload-tip">
+            <i class="el-icon-info"></i>
+            支持 .fits 和 .fit 格式文件，最大 100MB
+          </div>
+        </div>
+      </el-upload>
+    </div>
 
     <div v-if="headerData.length > 0" class="results-container">
       <div class="export-buttons">
@@ -151,9 +162,92 @@ export default {
   color: #66b1ff;
 }
 
-.upload-area {
-  margin: 20px auto;
-  width: 60%;
+/* 上传区域样式 */
+.upload-wrapper {
+  margin: 30px auto;
+  width: 100%;
+  max-width: 600px;
+}
+
+.upload-dragger {
+  width: 100%;
+}
+
+.upload-dragger .el-upload-dragger {
+  width: 100%;
+  height: 200px;
+  border: 2px dashed #d9d9d9;
+  border-radius: 8px;
+  background: #fafafa;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-dragger .el-upload-dragger:hover {
+  border-color: #409EFF;
+  background: #f0f9ff;
+}
+
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+}
+
+.upload-icon {
+  font-size: 48px;
+  color: #c0c4cc;
+  margin-bottom: 16px;
+  transition: color 0.3s ease;
+}
+
+.upload-dragger:hover .upload-icon {
+  color: #409EFF;
+}
+
+.upload-text {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.main-text {
+  font-size: 16px;
+  color: #606266;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+}
+
+.sub-text {
+  font-size: 14px;
+  color: #909399;
+  margin: 0;
+}
+
+.click-text {
+  color: #409EFF;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.upload-tip {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: #909399;
+  background: #f5f7fa;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.upload-tip i {
+  margin-right: 4px;
+  font-size: 14px;
 }
 
 .results-container {
