@@ -6,7 +6,7 @@
     <h2>数据可视化</h2>
 
     <!-- 数据可视化内容区域 -->
-    <div class="visualization-content">
+    <div class="visualization-content" v-loading="loading" element-loading-text="正在加载统计数据...">
       <!-- 左侧:分类统计模块 -->
       <div class="left-panel">
         <div class="panel-header">
@@ -28,7 +28,7 @@
       <!-- 右侧:年份统计模块 -->
       <div class="right-panel">
         <div class="panel-header">
-          <h3><i class="el-icon-trend-charts"></i> 年份统计</h3>
+          <h3><i class="el-icon-s-data"></i> 年份统计</h3>
           <p>按观测年份和月份趋势统计</p>
         </div>
         <div class="stats-container">
@@ -54,6 +54,7 @@ export default {
   name: 'DataVisualization',
   data() {
     return {
+      loading: true,
       charts: {
         imageType: null,
         object: null,
@@ -77,8 +78,8 @@ export default {
       this.$router.go(-1);
     },
     
-    
     async loadStats() {
+      this.loading = true;
       try {
         const response = await axios.get(`${axios.defaults.baseURL}/observation/stats`);
         if (response.data.code === 1) {
@@ -91,6 +92,8 @@ export default {
       } catch (error) {
         console.error('加载统计数据失败:', error);
         this.$message.error('加载统计数据失败');
+      } finally {
+        this.loading = false;
       }
     },
 
