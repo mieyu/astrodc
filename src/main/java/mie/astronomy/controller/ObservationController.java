@@ -131,4 +131,19 @@ public class ObservationController {
         }
     }
 
+
+    /**
+     * 获取数据可视化统计信息
+     * @return 包含各种统计数据的 Map
+     */
+    @GetMapping("/stats")
+    public Result<Map<String, Map<String, Long>>> getStats() {
+        Map<String, Map<String, Long>> stats = new java.util.HashMap<>();
+        stats.put("imageType", observationService.getImageTypeStats());
+        stats.put("object", observationService.getObjectStats());
+        stats.put("year", observationService.getYearStats());
+        stats.put("month", observationService.getMonthStats());
+        return Result.success(stats);
+    }
+
 }

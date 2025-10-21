@@ -204,4 +204,87 @@ public class ObservationServiceImpl extends ServiceImpl<ObservationMapper, Obser
     public boolean updateObservation(Observation observation) {
         return this.updateById(observation);
     }
+
+    @Override
+    public Map<String, Long> getImageTypeStats() {
+        List<Observation> list = this.list(new LambdaQueryWrapper<Observation>()
+                .isNotNull(Observation::getImagetyp)
+                .ne(Observation::getImagetyp, ""));
+        
+        return list.stream()
+                .collect(Collectors.groupingBy(
+                        Observation::getImagetyp,
+                        Collectors.counting()
+                ));
+    }
+
+    @Override
+    public Map<String, Long> getObjectStats() {
+        List<Observation> list = this.list(new LambdaQueryWrapper<Observation>()
+                .isNotNull(Observation::getObject)
+                .ne(Observation::getObject, ""));
+        
+        return list.stream()
+                .collect(Collectors.groupingBy(
+                        Observation::getObject,
+                        Collectors.counting()
+                ));
+    }
+
+    @Override
+    public Map<String, Long> getYearStats() {
+        List<Observation> list = this.list(new LambdaQueryWrapper<Observation>()
+                .isNotNull(Observation::getDateObs));
+        
+        return list.stream()
+                .filter(obs -> obs.getDateObs() != null)
+                .collect(Collectors.groupingBy(
+                        obs -> {
+                            String dateStr = obs.getDateObs().toString();
+                            return dateStr.substring(0, 4); // 提取年份
+                        },
+                        java.util.LinkedHashMap::new,
+                        Collectors.counting()
+                ))
+                .entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (v1, v2) -> v1,
+                        java.util.LinkedHashMap::new
+                ));
+    }
+
+    @Override
+    public Map<String, Long> getMonthStats() {
+        List<Observation> list = this.list(new LambdaQueryWrapper<Observation>()
+                .isNotNull(Observation::getDateObs));
+        
+        Map<String, Long> monthMap = list.stream()
+                .filter(obs -> obs.getDateObs() != null)
+                .collect(Collectors.groupingBy(
+                        obs -> {
+                            String dateStr = obs.getDateObs().toString();
+                            if (dateStr.length() >= 7) {
+                                return dateStr.substring(5, 7); // 提取月份
+                            }
+                            return "00";
+                        },
+                        Collectors.counting()
+                ));
+        
+        // 转换为 "1月"、"2月" 格式并排序
+        return monthMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toMap(
+                        entry -> {
+                            int month = Integer.parseInt(entry.getKey());
+                            return month + "月";
+                        },
+                        Map.Entry::getValue,
+                        (v1, v2) -> v1,
+                        java.util.LinkedHashMap::new
+                ));
+    }
 }

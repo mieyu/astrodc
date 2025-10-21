@@ -49,4 +49,29 @@ public interface ObservationService extends IService<Observation> {
      * @return 一个 Map，键是字段名 (e.g., "naxis"), 值是该字段不重复值的列表
      */
     List<String> getNaxisOptions();
+
+    
+    /**
+     * 获取图像类型统计数据
+     * @return 图像类型及其数量的映射
+     */
+    Map<String, Long> getImageTypeStats();
+
+    /**
+     * 获取观测目标统计数据
+     * @return 观测目标及其数量的映射
+     */
+    Map<String, Long> getObjectStats();
+
+    /**
+     * 获取年份统计数据
+     * @return 年份及其数量的映射
+     */
+    Map<String, Long> getYearStats();
+
+    /**
+     * 获取月份统计数据
+     * @return 月份及其数量的映射
+     */
+    Map<String, Long> getMonthStats();
 }
