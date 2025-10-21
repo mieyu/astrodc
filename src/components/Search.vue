@@ -3,13 +3,31 @@
     <div class="back-link-container">
       <a href="#" class="el-icon-back" @click.prevent="goBack"></a>
     </div>
-    <h2>查看所有图像</h2>
-    <el-button type="primary" @click="QueryAll">查询所有图像</el-button>
 
+    <!-- 快速查询区域 -->
+    <div class="quick-actions-section">
+      <div class="section-header">
+        <h2><i class="el-icon-view"></i> 快速查询</h2>
+        <p>快速浏览所有图像数据或进行数据可视化分析</p>
+      </div>
+      <div class="quick-actions">
+        <el-button type="primary" size="large" icon="el-icon-search" @click="QueryAll">
+          查询所有图像
+        </el-button>
+        <el-button type="success" size="large" icon="el-icon-data-analysis" @click="handleDataVisualization">
+          数据可视化
+        </el-button>
+      </div>
+    </div>
 
-    <hr>
-    <h2>图像信息检索</h2>
-    <el-table :data="tableData" border style="width: 100%">
+    <!-- 条件查询区域 -->
+    <div class="condition-section">
+      <div class="section-header">
+        <h2><i class="el-icon-filter"></i> 条件查询</h2>
+        <p>根据特定条件筛选和检索图像数据</p>
+      </div>
+      <div class="table-container">
+        <el-table :data="tableData" border class="condition-table" :header-cell-style="tableHeaderStyle">
       <el-table-column label="查询字段" width="150px">
         <template slot-scope="scope">
           <span>{{ scope.row.name === 'naxis' ? 'naxis1/naxis2' : scope.row.name }}</span>
@@ -68,10 +86,17 @@
       </el-table-column>
       <el-table-column prop="simple" label="示例 (simple)"></el-table-column>
       <el-table-column prop="type" label="类型 (type)" width="120px"></el-table-column>
-    </el-table>
-    <div class="button-group">
-      <el-button type="primary" @click="onQuery">条件查询</el-button>
-      <el-button @click="onReset">重置</el-button>
+        </el-table>
+      </div>
+      
+      <div class="action-buttons">
+        <el-button type="primary" size="medium" icon="el-icon-search" @click="onQuery">
+          执行查询
+        </el-button>
+        <el-button size="medium" icon="el-icon-refresh" @click="onReset">
+          重置条件
+        </el-button>
+      </div>
     </div>
   </el-form>
 </template>
@@ -199,6 +224,17 @@ export default {
       };
       this.selectedConditions = [];
     },
+    handleDataVisualization() {
+      // 跳转到数据可视化页面
+      this.$router.push({ path: '/data-visualization' });
+    },
+    tableHeaderStyle() {
+      return {
+        backgroundColor: '#f5f7fa',
+        color: '#606266',
+        fontWeight: 'bold'
+      };
+    },
 
     async fetchSelectOptions() {
       try {
@@ -220,30 +256,186 @@ export default {
 </script>
 
 <style scoped>
+/* 基础样式 */
 .condition-form {
-  position: relative; /* 为绝对定位的返回链接提供基准 */
+  position: relative;
   padding: 20px;
-  padding-top: 50px; /* 为返回链接留出空间 */
+  padding-top: 50px;
 }
+
 .back-link-container {
   position: absolute;
   top: 15px;
   left: 20px;
 }
+
 .back-link-container a {
   text-decoration: none;
   color: #409EFF;
   font-size: 14px;
 }
+
 .back-link-container a:hover {
   text-decoration: underline;
 }
+
 .input-pair-container {
   display: flex;
   gap: 10px;
   align-items: center;
 }
-.button-group {
-  margin-top: 20px;
+
+/* 保留的快速查询和条件查询区域样式 */
+.quick-actions-section,
+.condition-section {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.section-header h2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #303133;
+  margin: 0 0 10px 0;
+}
+
+.section-header h2 i {
+  color: #409EFF;
+  font-size: 24px;
+}
+
+.section-header p {
+  color: #909399;
+  font-size: 14px;
+  margin: 0;
+}
+
+.quick-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.quick-actions .el-button {
+  min-width: 160px;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.quick-actions .el-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.table-container {
+  margin: 25px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.condition-table {
+  width: 100%;
+}
+
+.condition-table .el-table__header {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.condition-table .el-table__row {
+  transition: all 0.3s ease;
+}
+
+.condition-table .el-table__row:hover {
+  background-color: #f8f9fa;
+  transform: scale(1.01);
+}
+
+.condition-table .el-checkbox {
+  margin-right: 0;
+}
+
+.condition-table .el-input,
+.condition-table .el-select,
+.condition-table .el-date-picker {
+  width: 100%;
+}
+
+.condition-table .el-radio-group {
+  display: flex;
+  gap: 15px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #ebeef5;
+}
+
+.action-buttons .el-button {
+  min-width: 140px;
+  height: 44px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.action-buttons .el-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* 按钮图标样式 */
+.el-button i {
+  margin-right: 6px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .quick-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .quick-actions .el-button {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .input-pair-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .action-buttons .el-button {
+    width: 100%;
+    max-width: 250px;
+  }
 }
 </style>

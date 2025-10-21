@@ -5,7 +5,8 @@ import Search from '../components/Search.vue'
 import TableList from '../components/TableList.vue'
 import FileBrowser from '../components/FileBrowser.vue'
 import FitsParser from '../components/FitsParser.vue'
-import Paper from '../components/Paper.vue';
+import Paper from '../components/Paper.vue'
+import DataVisualization from '../components/DataVisualization.vue';
 
 Vue.use(VueRouter)
 
@@ -38,7 +39,12 @@ const routes = [
     {
         path: '/paper',
         name: 'Paper',
-        component: Paper  // 新添加的路由
+        component: Paper
+    },
+    {
+        path: '/data-visualization',
+        name: 'DataVisualization',
+        component: DataVisualization
     },
 ]
 
