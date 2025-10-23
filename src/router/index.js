@@ -7,6 +7,7 @@ import FileBrowser from '../components/FileBrowser.vue'
 import FitsParser from '../components/FitsParser.vue'
 import Paper from '../components/Paper.vue'
 import DataVisualization from '../components/DataVisualization.vue';
+import AiAgent from '../components/AiAgent.vue'
 
 Vue.use(VueRouter)
 
@@ -46,6 +47,11 @@ const routes = [
         name: 'DataVisualization',
         component: DataVisualization
     },
+    {
+        path: '/aiagent',
+        name: 'AiAgent',
+        component: AiAgent
+    }
 ]
 
 const router = new VueRouter({

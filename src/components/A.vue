@@ -13,7 +13,7 @@
       <button class="btn" @click="$router.push('/search')">图像信息检索</button>
       <button class="btn" @click="$router.push('/files')">文件数据</button>
       <button class="btn" @click="$router.push('/fits-parser')">解析fits头文件</button>
-      <button class="btn" @click="$router.push('/fits-parser')">fits图像ai智能体</button>
+      <button class="btn" @click="$router.push('/aiagent')">fits图像ai智能体</button>
     </div>
   </div>
 </template>
