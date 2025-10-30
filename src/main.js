@@ -13,7 +13,7 @@ Vue.use(ElementUI)
 
 
 // 远程访问接口
-axios.defaults.baseURL = 'http://100.122.113.22:8088'
+axios.defaults.baseURL = 'http://10.126.126.2:8088'
 
 new Vue({
     router, // 在Vue实例中注册路由
