@@ -2,28 +2,21 @@
   <div class="sider-container">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <span>信息卡片 1</span>
+        <span>标签</span>
       </div>
-      <div v-for="o in 4" :key="o" class="text item">
-        {{'列表内容 ' + o }}
-      </div>
-    </el-card>
-
-    <el-card class="box-card">
-      <div slot="header" class="clearfix">
-        <span>信息卡片 2</span>
-      </div>
-      <div v-for="o in 4" :key="o" class="text item">
-        {{'列表内容 ' + o }}
+      <div class="text item">
+        <p>观测目标：太阳系巨行星卫星</p>       
+        <p>数据类型：图像数据</p>
+        <p>数据量：51170张</p>
       </div>
     </el-card>
 
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <span>信息卡片 3</span>
+        <span>网站维护</span>
       </div>
-      <div v-for="o in 4" :key="o" class="text item">
-        {{'列表内容 ' + o }}
+      <div class="text item">
+        <p>邮件 &nbsp &nbsp &nbsp &nbsp &nbsp miemieyu666@gamil.com</p>
       </div>
     </el-card>
   </div>

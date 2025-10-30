@@ -3,7 +3,10 @@
     <div class="back-link-container">
       <a href="#" class="el-icon-back" @click.prevent="goBack"></a>
     </div>
-    <h2>数据可视化</h2>
+    <div class="header-container">
+      <h2>数据可视化</h2>
+      <h2 class="total-count">总数据量：{{ totalCount }}</h2>
+    </div>
 
     <!-- 数据可视化内容区域 -->
     <div class="visualization-content" v-loading="loading" element-loading-text="正在加载统计数据...">
@@ -55,6 +58,7 @@ export default {
   data() {
     return {
       loading: true,
+      totalCount: 0,  // 添加这一行
       charts: {
         imageType: null,
         object: null,
@@ -84,6 +88,7 @@ export default {
         const response = await axios.get(`${axios.defaults.baseURL}/observation/stats`);
         if (response.data.code === 1) {
           const stats = response.data.data;
+          this.totalCount = stats.total || 0;  // 添加这一行
           this.initImageTypeChart(stats.imageType);
           this.initObjectChart(stats.object);
           this.initYearChart(stats.year);
@@ -337,6 +342,23 @@ export default {
 
 .back-link-container a:hover {
   text-decoration: underline;
+}
+
+/* 标题容器样式 */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.header-container h2 {
+  margin: 0;
+}
+
+.total-count {
+  color: #409EFF;
+  font-size: 18px;
 }
 
 /* 数据可视化内容区域 */

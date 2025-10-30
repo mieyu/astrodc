@@ -1,7 +1,7 @@
 <template>
   <footer class="site-footer">
     <div class="footer-bottom">
-      <p>&copy; {{ currentYear }} Your Company Name. All Rights Reserved.</p>
+      <p>&copy; {{ currentYear }} SUES . All Rights Reserved.</p>
       <p>
         <a href="/privacy">隐私政策</a> | <a href="/terms">服务条款</a>
       </p>
