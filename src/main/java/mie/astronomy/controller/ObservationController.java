@@ -137,12 +137,18 @@ public class ObservationController {
      * @return 包含各种统计数据的 Map
      */
     @GetMapping("/stats")
-    public Result<Map<String, Map<String, Long>>> getStats() {
-        Map<String, Map<String, Long>> stats = new java.util.HashMap<>();
+    public Result<Map<String, Object>> getStats() {
+        Map<String, Object> stats = new java.util.HashMap<>();
+        
+        // 添加总数据量
+        long total = observationService.count();
+        stats.put("total", total);
+        
         stats.put("imageType", observationService.getImageTypeStats());
         stats.put("object", observationService.getObjectStats());
         stats.put("year", observationService.getYearStats());
         stats.put("month", observationService.getMonthStats());
+        
         return Result.success(stats);
     }
 
