@@ -33,3 +33,8 @@ server:
 file:
   root-path: /media/miemieyu/work/Observated_images # 文件存储根路径（Linux环境）
   # root-path: /Volumes/work/Observated_images # Mac环境路径（注释备用）
+
+deepseek:
+  api-key: sk-5c80920be9644e87adef23788933bdd6
+  api-url: https://api.deepseek.com/v1/chat/completions
+  model: deepseek-chat
