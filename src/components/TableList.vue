@@ -1,8 +1,10 @@
 <template>
   <div class="table-list-container">
-    <div class="back-link-container">
-      <a class="el-icon-back" href="#" @click.prevent="goBack"></a>
-      <a class="el-icon-download" href="#" @click.prevent="download"></a>
+    <div class="toolbar-container">
+      <div class="back-link-container">
+        <el-button size="small" icon="el-icon-back" @click="goBack" plain>返回</el-button>
+        <el-button size="small" icon="el-icon-download" @click="download" plain>下载</el-button>
+      </div>
     </div>
 
     <el-table
@@ -11,8 +13,11 @@
         style="width: 100%"
         v-loading="loading"
         @sort-change="handleSortChange"
-        :row-class-name="tableRowClassName">
-      <el-table-column prop="pwd" label="文件地址" width="600" sortable="custom">
+        :row-class-name="tableRowClassName"
+        size="mini"
+        stripe>
+      <el-table-column type="index" label="#" width="60" align="center"></el-table-column>
+      <el-table-column prop="pwd" label="文件地址" width="600" sortable="custom" show-overflow-tooltip>
         <template slot-scope="scope">
           <a href="#" @click.prevent="handleFileDownload(scope.row)" class="file-link">{{ scope.row.pwd }}</a>
         </template>
@@ -23,41 +28,43 @@
           <el-button size="mini" type="primary" plain @click="handleModify(scope.row)">修改</el-button>
         </template>
       </el-table-column>
-      <el-table-column prop="fitName" label="FIT-NAME" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="simple" label="SIMPLE" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="bitpix" label="BITPIX" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="naxis" label="NAXIS" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="naxis1" label="NAXIS1" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="naxis2" label="NAXIS2" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="bscale" label="BSCALE" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="bzero" label="BZERO" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="object" label="OBJECT" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="imagetyp" label="IMAGETYP" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
+      <el-table-column prop="fitName" label="FIT-NAME" width="130" sortable="custom" :formatter="cellFormatter" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="simple" label="SIMPLE" width="100" sortable="custom" :formatter="cellFormatter" align="center"></el-table-column>
+      <el-table-column prop="bitpix" label="BITPIX" width="100" sortable="custom" :formatter="cellFormatter" align="center"></el-table-column>
+      <el-table-column prop="naxis" label="NAXIS" width="100" sortable="custom" :formatter="cellFormatter" align="center"></el-table-column>
+      <el-table-column prop="naxis1" label="NAXIS1" width="110" sortable="custom" :formatter="cellFormatter" align="center"></el-table-column>
+      <el-table-column prop="naxis2" label="NAXIS2" width="110" sortable="custom" :formatter="cellFormatter" align="center"></el-table-column>
+      <el-table-column prop="bscale" label="BSCALE" width="110" sortable="custom" :formatter="cellFormatter" align="center"></el-table-column>
+      <el-table-column prop="bzero" label="BZERO" width="110" sortable="custom" :formatter="cellFormatter" align="center"></el-table-column>
+      <el-table-column prop="object" label="OBJECT" width="140" sortable="custom" :formatter="cellFormatter" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="imagetyp" label="IMAGETYP" width="130" sortable="custom" :formatter="cellFormatter" show-overflow-tooltip></el-table-column>
       <el-table-column prop="dateObs" label="DATE-OBS" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="exptime" label="EXPTIME" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="otcd" label="OTCD" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="tele" label="TELE" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="teleap" label="TELEAP" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="telefl" label="TELEFL" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="rcenter" label="R-CENTER" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="dcenter" label="D-CENTER" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="xpixsz" label="XPIXSZ" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="ypixsz" label="YPIXSZ" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="xbinning" label="XBINNING" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="ybinning" label="YBINNING" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="filter" label="FILTER" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="rtAngle" label="RT-ANGLE" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="flipx" label="FLIPX" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="flipy" label="FLIPY" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
-      <el-table-column prop="rotCode" label="ROT-CODE" width="180" sortable="custom" :formatter="cellFormatter"></el-table-column>
+      <el-table-column prop="exptime" label="EXPTIME" width="110" sortable="custom" :formatter="cellFormatter" align="center"></el-table-column>
+      <el-table-column prop="otcd" label="OTCD" width="100" sortable="custom" :formatter="cellFormatter" align="center"></el-table-column>
+      <el-table-column prop="tele" label="TELE" width="120" sortable="custom" :formatter="cellFormatter" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="teleap" label="TELEAP" width="120" sortable="custom" :formatter="cellFormatter" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="telefl" label="TELEFL" width="120" sortable="custom" :formatter="cellFormatter" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="rcenter" label="R-CENTER" width="130" sortable="custom" :formatter="cellFormatter" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="dcenter" label="D-CENTER" width="130" sortable="custom" :formatter="cellFormatter" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="xpixsz" label="XPIXSZ" width="110" sortable="custom" :formatter="cellFormatter" align="center"></el-table-column>
+      <el-table-column prop="ypixsz" label="YPIXSZ" width="110" sortable="custom" :formatter="cellFormatter" align="center"></el-table-column>
+      <el-table-column prop="xbinning" label="XBINNING" width="120" sortable="custom" :formatter="cellFormatter" align="center"></el-table-column>
+      <el-table-column prop="ybinning" label="YBINNING" width="120" sortable="custom" :formatter="cellFormatter" align="center"></el-table-column>
+      <el-table-column prop="filter" label="FILTER" width="110" sortable="custom" :formatter="cellFormatter" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="rtAngle" label="RT-ANGLE" width="120" sortable="custom" :formatter="cellFormatter" align="center"></el-table-column>
+      <el-table-column prop="flipx" label="FLIPX" width="100" sortable="custom" :formatter="cellFormatter" align="center"></el-table-column>
+      <el-table-column prop="flipy" label="FLIPY" width="100" sortable="custom" :formatter="cellFormatter" align="center"></el-table-column>
+      <el-table-column prop="rotCode" label="ROT-CODE" width="120" sortable="custom" :formatter="cellFormatter" align="center"></el-table-column>
     </el-table>
 
     <div class="pagination-block">
       <el-pagination
           @current-change="handlePageChange"
+          @size-change="handlePageSizeChange"
           :current-page="currentPage"
           :page-size="pageSize"
-          layout="total, prev, pager, next, jumper"
+          :page-sizes="[50, 100, 300, 700, 1000]"
+          layout="total, sizes, prev, pager, next, jumper"
           :total="totalItems">
       </el-pagination>
     </div>
@@ -168,7 +175,7 @@ export default {
     async fetchData() {
       this.loading = true;
       try {
-        let url = `/observation/search?page=${this.currentPage}`;
+        let url = `/observation/search?page=${this.currentPage}&pageSize=${this.pageSize}`;
         if (this.sortField && this.sortOrder) {
           const order = this.sortOrder === 'ascending' ? 'asc' : 'desc';
           url += `&sortField=${this.sortField}&sortOrder=${order}`;
@@ -190,6 +197,11 @@ export default {
     },
     handlePageChange(newPage) {
       this.currentPage = newPage;
+      this.fetchData();
+    },
+    handlePageSizeChange(newSize) {
+      this.pageSize = newSize;
+      this.currentPage = 1;
       this.fetchData();
     },
     handleSortChange({ prop, order }) {
@@ -289,16 +301,109 @@ export default {
 </script>
 
 <style scoped>
-.el-table .cell { text-align: center; }
-.el-table td, .el-table th { padding: 2px 0; }
-.pagination-block { margin-top: 20px; text-align: center; }
-.table-list-container { position: relative; padding: 40px 5px 20px 5px; }
-.back-link-container { position: absolute; top: 10px; left: 20px; }
-.back-link-container a { text-decoration: none; color: #409EFF; font-size: 14px; }
-.back-link-container a:hover { text-decoration: underline; }
-.edit-form-container { max-height: 70vh; overflow-y: auto; }
-.fits-image-container { text-align: center; min-height: 200px; }
-.file-link { text-decoration: none; color: #409EFF; cursor: pointer; }
-.file-link:hover { text-decoration: underline; }
-.preview-disclaimer { text-align: center; margin-top: 10px; font-size: 12px; color: #909399; }
+.table-list-container {
+  position: relative;
+  padding: 10px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.toolbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 5px 0;
+}
+
+.back-link-container {
+  display: flex;
+  gap: 8px;
+}
+
+.el-table {
+  flex: 1;
+  font-size: 12px;
+}
+
+.el-table .cell {
+  text-align: center;
+  padding: 4px 8px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.el-table td, .el-table th {
+  padding: 4px 0 !important;
+}
+
+.el-table th {
+  font-size: 12px;
+  font-weight: 600;
+  background-color: #f5f7fa;
+}
+
+.el-table--mini td, .el-table--mini th {
+  padding: 4px 0 !important;
+}
+
+.pagination-block {
+  margin-top: 15px;
+  padding: 10px 0;
+  text-align: center;
+  border-top: 1px solid #ebeef5;
+}
+
+.edit-form-container {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.fits-image-container {
+  text-align: center;
+  min-height: 200px;
+}
+
+.file-link {
+  text-decoration: none;
+  color: #409EFF;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.file-link:hover {
+  text-decoration: underline;
+}
+
+.preview-disclaimer {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #909399;
+}
+
+/* 紧凑的按钮样式 */
+.el-button--mini {
+  padding: 5px 8px;
+  font-size: 12px;
+}
+
+.el-button.is-circle {
+  padding: 5px;
+}
+
+/* 表格条纹优化 */
+.el-table--striped .el-table__body tr.el-table__row--striped td {
+  background-color: #fafafa;
+}
+
+/* 确保表格可以横向滚动 */
+.el-table {
+  overflow-x: auto;
+}
+
+.el-table__body-wrapper {
+  overflow-x: auto;
+}
 </style>

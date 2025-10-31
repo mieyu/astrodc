@@ -31,7 +31,7 @@
 
     <div v-if="result" class="result-section">
       <!-- SQL查询 -->
-      <!-- <div class="sql-box">
+      <div class="sql-box">
         <div class="box-header">
           <h3>📝 生成的SQL查询</h3>
           <button @click="copySql" class="copy-btn">
@@ -39,7 +39,7 @@
           </button>
         </div>
         <pre><code>{{ result.sql }}</code></pre>
-      </div> -->
+      </div>
 
       <!-- AI摘要 -->
       <div class="summary-box">
@@ -119,7 +119,7 @@ export default {
       this.result = null
       
       try {
-        const response = await fetch('http://127.0.0.1:8000/analyze', {
+        const response = await fetch('http://10.126.126.2:8088/analyze', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -136,7 +136,7 @@ export default {
         
         this.result = await response.json()
       } catch (err) {
-        this.error = `请求失败: ${err.message}。请确保后端服务运行在 http://127.0.0.1:8000`
+        this.error = `请求失败: ${err.message}。请确保后端服务运行在 http://10.126.126.2:8088`
       } finally {
         this.loading = false
       }
