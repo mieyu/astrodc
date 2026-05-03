@@ -1,9 +1,6 @@
 <template>
   <div class="parser-container">
-    <div class="header-wrapper">
-      <a class="el-icon-back back-icon" href="#" @click.prevent="goBack"></a>
-      <h2>FITS 头文件解析器</h2>
-    </div>
+    <h2>FITS 头文件解析器</h2>
 
     <p>请将 FITS 文件拖拽到下方区域，或点击上传。</p>
 
@@ -82,9 +79,6 @@ export default {
       }
     },
 
-    goBack() {
-      this.$router.go(-1);
-    },
     handleSuccess(response) {
       if (response.code === 1) {
         this.headerData = response.data;
@@ -146,20 +140,6 @@ export default {
   position: relative;
   padding: 20px;
   text-align: center;
-}
-
-.back-icon {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  text-decoration: none;
-  font-size: 24px;
-  color: #409EFF;
-  cursor: pointer;
-}
-
-.back-icon:hover {
-  color: #66b1ff;
 }
 
 /* 上传区域样式 */
