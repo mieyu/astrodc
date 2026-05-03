@@ -123,7 +123,8 @@ html, body {
 
 /* 确保 header 在最上层,sidebar 在它之下 */
 .el-header {
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 10;
   background-color: #cacacf;
 }
