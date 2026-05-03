@@ -5,8 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class ObservationQueryDto {
-    // 单一值查询字段
+public class ImageOwnQueryDto {
     private String pwd;
     private String fitName;
     private Integer simple;
@@ -25,7 +24,6 @@ public class ObservationQueryDto {
     private String rCenter;
     private String dCenter;
 
-    // 范围查询字段 - Min
     private Integer bitpixMin;
     private Integer naxisMin;
     private Integer naxis1Min;
@@ -40,7 +38,6 @@ public class ObservationQueryDto {
     private Integer ybinningMin;
     private Double rtAngleMin;
 
-    // 范围查询字段 - Max
     private Integer bitpixMax;
     private Integer naxisMax;
     private Integer naxis1Max;

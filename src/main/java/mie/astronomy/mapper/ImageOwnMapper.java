@@ -1,9 +1,9 @@
 package mie.astronomy.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import mie.astronomy.entity.Observation;
+import mie.astronomy.entity.ImageOwn;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface ObservationMapper extends BaseMapper<Observation> {
+public interface ImageOwnMapper extends BaseMapper<ImageOwn> {
 }
