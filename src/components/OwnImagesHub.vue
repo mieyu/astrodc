@@ -8,7 +8,6 @@
     <div class="buttons">
       <button class="btn" @click="$router.push('/data/images/own/search')">图像信息检索</button>
       <button class="btn" @click="$router.push('/data/images/own/files')">文件数据</button>
-      <button class="btn" @click="$router.push('/data/images/own/fits-parser')">解析fits头文件</button>
     </div>
   </div>
 </template>

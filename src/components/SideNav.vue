@@ -78,6 +78,11 @@
         <el-menu-item index="/services/prediction/imcce-api">历表位置(IMCCE API)</el-menu-item>
         <el-menu-item index="/services/prediction/jpl-de">JPL DE系列+卫星模型</el-menu-item>
       </el-submenu>
+
+      <el-menu-item index="/services/fits-parser">
+        <i class="el-icon-document"></i>
+        <span slot="title">FITS头文件解析</span>
+      </el-menu-item>
     </el-submenu>
   </el-menu>
 </template>

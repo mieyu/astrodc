@@ -42,12 +42,6 @@ const routes = [
         meta: { title: '文件数据' }
     },
     {
-        path: '/data/images/own/fits-parser',
-        name: 'FitsParser',
-        component: FitsParser,
-        meta: { title: '解析FITS头文件' }
-    },
-    {
         path: '/data/images/own/visualization',
         name: 'DataVisualization',
         component: DataVisualization,
@@ -68,6 +62,7 @@ const routes = [
     { path: '/services/observation/exposure-calculator', component: Placeholder, meta: { title: '曝光时间计算器' } },
     { path: '/services/prediction/imcce-api', component: Placeholder, meta: { title: '历表位置 (IMCCE API 查询)' } },
     { path: '/services/prediction/jpl-de', component: Placeholder, meta: { title: 'JPL DE系列 + 卫星模型' } },
+    { path: '/services/fits-parser', name: 'FitsParser', component: FitsParser, meta: { title: '解析FITS头文件' } },
 
     // 全局功能
     { path: '/paper', name: 'Paper', component: Paper },
@@ -77,7 +72,8 @@ const routes = [
     { path: '/search', redirect: '/data/images/own/search' },
     { path: '/table', redirect: '/data/images/own/table' },
     { path: '/files', redirect: '/data/images/own/files' },
-    { path: '/fits-parser', redirect: '/data/images/own/fits-parser' },
+    { path: '/fits-parser', redirect: '/services/fits-parser' },
+    { path: '/data/images/own/fits-parser', redirect: '/services/fits-parser' },
     { path: '/data-visualization', redirect: '/data/images/own/visualization' }
 ]
 

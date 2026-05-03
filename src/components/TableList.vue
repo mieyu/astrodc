@@ -159,11 +159,11 @@ export default {
     async download() {
       this.$message.info("正在准备下载文件，请稍候...");
       try {
-        const response = await axios.post('/observation/download', this.searchQuery, { responseType: 'blob' });
+        const response = await axios.post('/api/image/own/download', this.searchQuery, { responseType: 'blob' });
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'observations.csv');
+        link.setAttribute('download', 'image_own.csv');
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -175,7 +175,7 @@ export default {
     async fetchData() {
       this.loading = true;
       try {
-        let url = `/observation/search?page=${this.currentPage}&pageSize=${this.pageSize}`;
+        let url = `/api/image/own/search?page=${this.currentPage}&pageSize=${this.pageSize}`;
         if (this.sortField && this.sortOrder) {
           const order = this.sortOrder === 'ascending' ? 'asc' : 'desc';
           url += `&sortField=${this.sortField}&sortOrder=${order}`;
@@ -228,7 +228,7 @@ export default {
     },
     async submitUpdate() {
       try {
-        const response = await axios.put('/observation/update', this.editForm);
+        const response = await axios.put('/api/image/own/update', this.editForm);
         if (response.data.code === 1) {
           this.$message.success('更新成功！');
           this.dialogVisible = false;
@@ -242,7 +242,7 @@ export default {
     },
     async fetchSelectOptions() {
       try {
-        const response = await axios.get('/observation/options');
+        const response = await axios.get('/api/image/own/options');
         if (response.data.code === 1) {
           this.selectOptions = response.data.data;
         } else {

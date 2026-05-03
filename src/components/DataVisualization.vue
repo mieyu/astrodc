@@ -85,7 +85,7 @@ export default {
     async loadStats() {
       this.loading = true;
       try {
-        const response = await axios.get(`${axios.defaults.baseURL}/observation/stats`);
+        const response = await axios.get(`${axios.defaults.baseURL}/api/image/own/stats`);
         if (response.data.code === 1) {
           const stats = response.data.data;
           this.totalCount = stats.total || 0;  // 添加这一行

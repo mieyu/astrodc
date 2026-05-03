@@ -238,7 +238,7 @@ export default {
 
     async fetchSelectOptions() {
       try {
-        const response = await axios.get('/observation/options');
+        const response = await axios.get('/api/image/own/options');
         if (response.data.code === 1) {
           this.selectOptions = response.data.data;
         } else {
