@@ -38,3 +38,15 @@ deepseek:
   api-key: sk-5c80920be9644e87adef23788933bdd6
   api-url: https://api.deepseek.com/v1/chat/completions
   model: deepseek-chat
+
+ephemeris:
+  msu-url: https://www.sai.msu.ru/neb/nss/cgi-bin/nss-eph3.cgi
+  dss-url: https://archive.stsci.edu/cgi-bin/dss_search
+  dss-survey: poss2ukstu_red
+  connect-timeout-ms: 10000
+  msu-read-timeout-ms: 15000
+  dss-read-timeout-ms: 60000
+  proxy:
+    enabled: false
+    host: ""
+    port: 0
