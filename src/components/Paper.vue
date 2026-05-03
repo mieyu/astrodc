@@ -49,7 +49,7 @@ export default {
     // 获取galaxy分类
     async fetchGalaxies() {
       try {
-        const response = await axios.get('/paper/galaxies');
+        const response = await axios.get('/api/site/paper/galaxies');
         if (response.data.code === 1) {
           this.galaxies = response.data.data;
         } else {
@@ -64,7 +64,7 @@ export default {
     async handleSelect(galaxy) {
       this.activeGalaxy = galaxy;
       try {
-        const response = await axios.get('/paper/by-galaxy', { 
+        const response = await axios.get('/api/site/paper/by-galaxy', {
           params: { galaxy },
         });
         if (response.data.code === 1) {
