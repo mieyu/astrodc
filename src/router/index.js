@@ -51,7 +51,6 @@ const routes = [
 
     // 数据存储 - 占位
     { path: '/data/images/others', component: Placeholder, meta: { title: '其他图像' } },
-    { path: '/data/positioning/raw', component: Placeholder, meta: { title: '定位结果(IMCCE原始定位数据)' } },
     { path: '/data/positioning/normalized', component: Placeholder, meta: { title: '规范后的定位结果(观测星表)' } },
     { path: '/data/catalog-bias', component: Placeholder, meta: { title: '星表偏差修正表' } },
     { path: '/data/catalog-bias/display', component: Placeholder, meta: { title: '星表偏差修正表 - 数据展示' } },
