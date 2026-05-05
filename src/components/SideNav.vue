@@ -28,11 +28,6 @@
         <el-menu-item index="/data/images/others">其他图像</el-menu-item>
       </el-submenu>
 
-      <el-menu-item index="/data/positioning/raw">
-        <i class="el-icon-aim"></i>
-        <span slot="title">定位结果(IMCCE原始)</span>
-      </el-menu-item>
-
       <el-menu-item index="/data/positioning/normalized">
         <i class="el-icon-tickets"></i>
         <span slot="title">规范后定位结果(观测星表)</span>
