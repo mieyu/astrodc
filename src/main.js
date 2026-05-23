@@ -9,7 +9,7 @@ Vue.config.productionTip = false
 Vue.use(ElementUI)
 
 // 本地访问接口
-// axios.defaults.baseURL = 'http://127.0.0.1:8088'
+// axios.defaults.baseURL = 'http://127.0.0.2:8088'
 
 
 // 远程访问接口
