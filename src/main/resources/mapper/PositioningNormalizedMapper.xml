@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mie.astronomy.mapper.PositioningNormalizedMapper">
+
+    <!--
+    全部 51 列。SELECT * 也可以,但显式列出可避免 mapUnderscoreToCamelCase 的潜在影响,
+    并保证导出/流式读取列序固定。
+    `reference` 是 MySQL 关键字,需要反引号。
+    -->
+    <sql id="allColumns">
+        global_id, target_id, relative_to, jd1, jd2, jd_tt1, jd_tt2,
+        time_scale, epoch, obs_type, w1, w2, w1_unit, w2_unit,
+        coordinates, `reference`, centre_of_frame, obs_site, observer_pos,
+        receptor, telescope, reduction, coord_route, coord_status, coord_note,
+        w1_icrs, w2_icrs, ra_A_icrs, dec_A_icrs, ra_B_horizons, dec_B_horizons,
+        w1_theory, w2_theory, w1_nss, w2_nss, w1_nss_icrs, w2_nss_icrs,
+        oc_horizon_icrs_w1, oc_horizon_w2, oc_nss_native_w1, oc_nss_native_w2,
+        oc_nss_icrs_w1, oc_nss_icrs_w2, dRA_star_cosdec_arcsec, dDEC_star_arcsec,
+        source_web_html, source_web_txt, source_local_html, source_local_txt,
+        created_at, updated_at
+    </sql>
+
+    <sql id="filterWhere">
+        <where>
+            <if test="q.target_id != null and q.target_id != ''">
+                AND target_id = #{q.target_id}
+            </if>
+            <if test="q.obs_type != null and q.obs_type != ''">
+                AND obs_type = #{q.obs_type}
+            </if>
+            <if test="q.coord_status != null and q.coord_status != ''">
+                AND coord_status = #{q.coord_status}
+            </if>
+            <if test="q.obs_site != null and q.obs_site != ''">
+                AND obs_site LIKE CONCAT('%', #{q.obs_site}, '%')
+            </if>
+            <if test="q.jd1Min != null">
+                AND jd1 &gt;= #{q.jd1Min}
+            </if>
+            <if test="q.jd1Max != null">
+                AND jd1 &lt;= #{q.jd1Max}
+            </if>
+        </where>
+    </sql>
+
+    <!--
+    DISTINCT 值。fieldName 由 service 层用白名单校验,这里直接 ${} 拼接列名是安全的。
+    -->
+    <select id="selectDistinctValues" resultType="java.lang.String">
+        SELECT DISTINCT ${fieldName}
+        FROM positioning_normalized
+        WHERE ${fieldName} IS NOT NULL AND ${fieldName} != ''
+        ORDER BY ${fieldName}
+        LIMIT 200
+    </select>
+
+    <!-- 流式导出。@Options(fetchSize=Integer.MIN_VALUE) 在 service 中通过 SqlSession 设置,
+         也可以在这里通过 fetchSize 属性指定。 -->
+    <select id="streamByQuery"
+            parameterType="mie.astronomy.dto.PositioningNormalizedQuery"
+            resultType="mie.astronomy.entity.PositioningNormalized"
+            fetchSize="-2147483648"
+            resultSetType="FORWARD_ONLY">
+        SELECT
+        <include refid="allColumns"/>
+        FROM positioning_normalized
+        <include refid="filterWhere"/>
+        ORDER BY jd1 ASC
+    </select>
+
+</mapper>
