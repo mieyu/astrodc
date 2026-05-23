@@ -5,7 +5,9 @@
     <!-- 筛选条 -->
     <el-form :inline="true" :model="filters" class="np-filter-bar" size="small">
       <el-form-item label="target_id">
-        <el-input v-model="filters.target_id" placeholder="如 499" clearable style="width: 140px"></el-input>
+        <el-select v-model="filters.target_id" placeholder="全部" clearable filterable style="width: 140px">
+          <el-option v-for="o in opts.target_id" :key="o" :label="o" :value="o"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="JD 范围">
         <el-input-number v-model="filters.jd1Min" :controls="false" placeholder="起" style="width: 140px"></el-input-number>
@@ -35,19 +37,21 @@
     <!-- 视图模式切换 -->
     <div class="np-view-toolbar">
       <el-radio-group v-model="viewMode" size="small" @change="onViewModeChange">
-        <el-radio-button label="core">核心列模式</el-radio-button>
-        <el-radio-button label="grouped">分组视图</el-radio-button>
+        <el-radio-button label="core">概览视图</el-radio-button>
+        <el-radio-button label="grouped">字段分组</el-radio-button>
       </el-radio-group>
 
-      <el-popover v-if="viewMode === 'core'" placement="bottom-end" width="320" trigger="click">
+      <el-popover v-if="viewMode === 'core'" placement="bottom-end" width="280" trigger="click" popper-class="np-col-popper">
         <div class="np-col-popover">
           <div class="np-col-popover-head">
             <span>更多列</span>
             <el-button type="text" size="mini" @click="resetExtraColumns">清空</el-button>
           </div>
-          <el-checkbox-group v-model="extraColumns" @change="persistExtraColumns">
-            <el-checkbox v-for="col in extraColumnCandidates" :key="col" :label="col" class="np-col-checkbox">{{ col }}</el-checkbox>
-          </el-checkbox-group>
+          <div class="np-col-popover-body">
+            <el-checkbox-group v-model="extraColumns" @change="persistExtraColumns">
+              <el-checkbox v-for="col in extraColumnCandidates" :key="col" :label="col" class="np-col-checkbox">{{ col }}</el-checkbox>
+            </el-checkbox-group>
+          </div>
         </div>
         <el-button slot="reference" size="small" plain icon="el-icon-s-grid">更多列 ({{ extraColumns.length }})</el-button>
       </el-popover>
@@ -60,6 +64,7 @@
 
     <!-- 表格 -->
     <el-table
+      ref="npTable"
       :data="tableData"
       v-loading="loading"
       border
@@ -73,7 +78,8 @@
         :prop="col.prop"
         :label="col.label"
         :min-width="col.minWidth || 120"
-        :align="col.align || 'left'"
+        align="left"
+        header-align="center"
         :sortable="col.sortable ? 'custom' : false"
         :formatter="cellFormatter"
         show-overflow-tooltip>
@@ -218,6 +224,7 @@ export default {
         coord_status: ''
       },
       opts: {
+        target_id: [],
         obs_type: [],
         coord_status: []
       },
@@ -250,9 +257,23 @@ export default {
       return group.props.map(p => ALL_COLUMNS.find(c => c.prop === p)).filter(Boolean);
     }
   },
+  watch: {
+    // 列集合变化后必须重算布局, 否则 fixed="right" 的操作列会与主表行高错位
+    currentColumns() {
+      this.$nextTick(() => {
+        if (this.$refs.npTable) this.$refs.npTable.doLayout();
+      });
+    },
+    tableData() {
+      this.$nextTick(() => {
+        if (this.$refs.npTable) this.$refs.npTable.doLayout();
+      });
+    }
+  },
   created() {
     this.restoreFromStorage();
     this.restoreFromQuery();
+    this.fetchOptions('target_id');
     this.fetchOptions('obs_type');
     this.fetchOptions('coord_status');
     this.fetchList();
@@ -507,7 +528,14 @@ export default {
   text-align: right;
 }
 
+.np-col-popover {
+  display: flex;
+  flex-direction: column;
+  max-height: 400px;
+}
+
 .np-col-popover-head {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -516,6 +544,19 @@ export default {
   border-bottom: 1px solid #ebeef5;
   font-weight: 500;
   color: #606266;
+}
+
+.np-col-popover-body {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.np-col-popover-body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .np-col-checkbox {
