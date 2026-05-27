@@ -9,7 +9,7 @@
     </div>
 
     <div class="page-header">
-      <h2><i class="el-icon-cpu"></i> 天文卫星星历与寻星图工具</h2>
+      <h2><i class="el-icon-cpu"></i> 天然卫星星历与寻星图工具</h2>
       <p>数据来源: SAI MSU / STScI DSS</p>
     </div>
 
