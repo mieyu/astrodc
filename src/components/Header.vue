@@ -1,6 +1,6 @@
 <template>
   <div class="header-container">
-    <span class="header-title">太阳系天然卫星处理</span>
+    <span class="header-title">天然卫星数据中心</span>
 
     <el-menu
         :default-active="activeIndex"
