@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mie.astronomy.mapper.CatalogBiasCorrectionMapper">
+
+    <sql id="allColumns">
+        ipix,
+        ac_dra_mas, ac_ddec_mas, ac_pmra_masyr, ac_pmdec_masyr,
+        acrs_dra_mas, acrs_ddec_mas, acrs_pmra_masyr, acrs_pmdec_masyr,
+        act_dra_mas, act_ddec_mas, act_pmra_masyr, act_pmdec_masyr,
+        agk1_dra_mas, agk1_ddec_mas, agk1_pmra_masyr, agk1_pmdec_masyr,
+        agk3_dra_mas, agk3_ddec_mas, agk3_pmra_masyr, agk3_pmdec_masyr,
+        fk4catalogue_dra_mas, fk4catalogue_ddec_mas, fk4catalogue_pmra_masyr, fk4catalogue_pmdec_masyr,
+        gaiadr1_dra_mas, gaiadr1_ddec_mas, gaiadr1_pmra_masyr, gaiadr1_pmdec_masyr,
+        gaiadr2_dra_mas, gaiadr2_ddec_mas, gaiadr2_pmra_masyr, gaiadr2_pmdec_masyr,
+        gsc1_2_dra_mas, gsc1_2_ddec_mas, gsc1_2_pmra_masyr, gsc1_2_pmdec_masyr,
+        hipparcos_dra_mas, hipparcos_ddec_mas, hipparcos_pmra_masyr, hipparcos_pmdec_masyr,
+        ppm_dra_mas, ppm_ddec_mas, ppm_pmra_masyr, ppm_pmdec_masyr,
+        sao_dra_mas, sao_ddec_mas, sao_pmra_masyr, sao_pmdec_masyr,
+        tycho2_dra_mas, tycho2_ddec_mas, tycho2_pmra_masyr, tycho2_pmdec_masyr,
+        ucac2_dra_mas, ucac2_ddec_mas, ucac2_pmra_masyr, ucac2_pmdec_masyr,
+        ucac4_dra_mas, ucac4_ddec_mas, ucac4_pmra_masyr, ucac4_pmdec_masyr,
+        usno_a2_dra_mas, usno_a2_ddec_mas, usno_a2_pmra_masyr, usno_a2_pmdec_masyr,
+        yale_dra_mas, yale_ddec_mas, yale_pmra_masyr, yale_pmdec_masyr
+    </sql>
+
+    <sql id="filterWhere">
+        <where>
+            <if test="q != null and q.ipixMin != null">
+                AND ipix &gt;= #{q.ipixMin}
+            </if>
+            <if test="q != null and q.ipixMax != null">
+                AND ipix &lt;= #{q.ipixMax}
+            </if>
+        </where>
+    </sql>
+
+    <select id="streamByQuery"
+            parameterType="mie.astronomy.dto.CatalogBiasCorrectionQuery"
+            resultType="java.util.HashMap"
+            fetchSize="-2147483648"
+            resultSetType="FORWARD_ONLY">
+        SELECT
+        <include refid="allColumns"/>
+        FROM catalog_bias_correction
+        <include refid="filterWhere"/>
+        ORDER BY ipix ASC
+    </select>
+
+</mapper>
