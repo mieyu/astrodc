@@ -84,7 +84,7 @@ export default {
   name: 'SideNav',
   data() {
     return {
-      defaultOpeneds: ['data', 'data-images', 'services']
+      defaultOpeneds: []
     };
   }
 };
@@ -98,5 +98,13 @@ export default {
 
 .side-nav:not(.el-menu--collapse) {
   width: 240px;
+}
+
+.side-nav >>> .el-submenu__icon-arrow {
+  transform: rotate(-90deg);
+}
+
+.side-nav >>> .el-submenu.is-opened > .el-submenu__title .el-submenu__icon-arrow {
+  transform: rotate(0deg);
 }
 </style>
