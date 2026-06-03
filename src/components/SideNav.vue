@@ -33,13 +33,10 @@
         <span slot="title">规范后定位结果(观测星表)</span>
       </el-menu-item>
 
-      <el-submenu index="data-catalog-bias">
-        <template slot="title">
-          <i class="el-icon-data-line"></i>
-          <span>星表偏差修正表</span>
-        </template>
-        <el-menu-item index="/data/catalog-bias/display">数据展示</el-menu-item>
-      </el-submenu>
+      <el-menu-item index="/data/catalog-bias">
+        <i class="el-icon-data-line"></i>
+        <span slot="title">星表偏差修正表</span>
+      </el-menu-item>
 
       <el-submenu index="data-spectrum">
         <template slot="title">
@@ -87,7 +84,7 @@ export default {
   name: 'SideNav',
   data() {
     return {
-      defaultOpeneds: ['data', 'data-images', 'data-catalog-bias', 'services']
+      defaultOpeneds: ['data', 'data-images', 'services']
     };
   }
 };
