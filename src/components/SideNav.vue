@@ -87,7 +87,7 @@ export default {
   name: 'SideNav',
   data() {
     return {
-      defaultOpeneds: ['data', 'data-images', 'services']
+      defaultOpeneds: ['data', 'data-images', 'data-catalog-bias', 'services']
     };
   }
 };

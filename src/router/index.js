@@ -12,6 +12,7 @@ import OwnImagesHub from '../components/OwnImagesHub.vue'
 import Placeholder from '../components/Placeholder.vue'
 import EphemerisTool from '../components/EphemerisTool.vue'
 import NormalizedPositioning from '../components/NormalizedPositioning.vue'
+import CatalogBiasCorrection from '../components/CatalogBiasCorrection.vue'
 
 Vue.use(VueRouter)
 
@@ -54,7 +55,7 @@ const routes = [
     { path: '/data/images/others', component: Placeholder, meta: { title: '其他图像' } },
     { path: '/data/positioning/normalized', name: 'NormalizedPositioning', component: NormalizedPositioning, meta: { title: '规范后的定位结果(观测星表)' } },
     { path: '/data/catalog-bias', component: Placeholder, meta: { title: '星表偏差修正表' } },
-    { path: '/data/catalog-bias/display', component: Placeholder, meta: { title: '星表偏差修正表 - 数据展示' } },
+    { path: '/data/catalog-bias/display', name: 'CatalogBiasCorrection', component: CatalogBiasCorrection, meta: { title: '星表偏差修正表 - 数据展示' } },
     { path: '/data/spectrum', component: Placeholder, meta: { title: '光谱数据' } },
     { path: '/data/spectrum/release', component: Placeholder, meta: { title: '光谱数据 - 空间释放数据' } },
 
