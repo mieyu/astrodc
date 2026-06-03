@@ -62,7 +62,7 @@
         :formatter="cellFormatter"
         show-overflow-tooltip>
       </el-table-column>
-      <el-table-column label="操作" width="160" align="center" header-align="center" fixed="right">
+      <el-table-column label="操作" width="190" align="center" header-align="center" fixed="right">
         <template slot-scope="scope">
           <div class="cbc-row-actions">
             <el-button size="mini" icon="el-icon-document" @click="openDetail(scope.row)">详情</el-button>
@@ -482,9 +482,14 @@ export default {
 
 .cbc-row-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  flex-wrap: nowrap;
+  gap: 8px;
   justify-content: center;
+  align-items: center;
+}
+
+.cbc-row-actions >>> .el-button {
+  white-space: nowrap;
 }
 
 .cbc-row-actions >>> .el-button + .el-button {
