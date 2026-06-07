@@ -1,12 +1,16 @@
 <template>
   <div class="file-browser-container">
-    <div class="breadcrumb">
-      <a class="el-icon-back back-icon" href="#" @click.prevent="goBack"></a>
-
-      <a href="#" @click.prevent="navigateToPath('')">根目录</a>
+    <div class="app-back-bar">
+      <button type="button" class="app-back-button" @click="goBack">
+        <i class="el-icon-arrow-left"></i>
+        <span>返回上一页</span>
+      </button>
+      <div class="app-back-context breadcrumb-path">
+        <a href="#" @click.prevent="navigateToPath('')">根目录</a>
       <span v-for="(part, index) in pathParts" :key="index">
         / <a href="#" @click.prevent="navigateToPath(part.path)">{{ part.name }}</a>
       </span>
+      </div>
     </div>
 
     <el-table :data="files" v-loading="loading" style="width: 100%">
@@ -104,19 +108,22 @@ export default {
 .file-browser-container {
   padding: 20px;
 }
-.breadcrumb {
-  margin-bottom: 20px;
-  font-size: 16px;
-  display: flex; /* 使用 Flex 布局，方便对齐 */
-  align-items: center;
+.breadcrumb-path {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
 }
-/* 新增：返回图标的样式 */
-.back-icon {
-  margin-right: 15px; /* 与右侧文字的间距 */
-  font-size: 18px; /* 图标稍大一些 */
+
+.breadcrumb-path a {
   color: #409EFF;
   text-decoration: none;
 }
+
+.breadcrumb-path a:hover {
+  text-decoration: underline;
+}
+
 .file-link {
   margin-left: 10px;
   text-decoration: none;

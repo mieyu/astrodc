@@ -1,7 +1,10 @@
 <template>
   <div class="data-visualization-container">
-    <div class="back-link-container">
-      <a href="#" class="el-icon-back" @click.prevent="goBack"></a>
+    <div class="app-back-bar">
+      <button type="button" class="app-back-button" @click="goBack">
+        <i class="el-icon-arrow-left"></i>
+        <span>返回上一页</span>
+      </button>
     </div>
     <div class="header-container">
       <h2>数据可视化</h2>
@@ -325,23 +328,6 @@ export default {
 .data-visualization-container {
   position: relative;
   padding: 20px;
-  padding-top: 50px;
-}
-
-.back-link-container {
-  position: absolute;
-  top: 15px;
-  left: 20px;
-}
-
-.back-link-container a {
-  text-decoration: none;
-  color: #409EFF;
-  font-size: 14px;
-}
-
-.back-link-container a:hover {
-  text-decoration: underline;
 }
 
 /* 标题容器样式 */

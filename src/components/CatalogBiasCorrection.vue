@@ -1,6 +1,11 @@
 <template>
   <div class="cbc-container">
-    <h2 class="cbc-title">星表偏差修正表</h2>
+    <section v-if="!activeGroup" class="cbc-head-panel">
+      <h2 class="cbc-title">星表偏差修正表</h2>
+      <p class="cbc-summary">
+        17 个历史星表（AC、ACRS、ACT、AGK1、AGK3、FK4、Gaia DR1/Gaia DR2、GSC1.2、Hipparcos、PPM、SAO、Tycho-2、UCAC2/4、USNO-A2.0、Yale）的空间分辨位置和自行修正，基于与 Gaia DR3 在 HEALPix 天球网格（N_side = 64 和 256）上的交叉匹配得出。修正包括 Δα·cosδ、Δδ（位置）以及赤经/赤纬方向的自行偏移，均参考历元 J2000.0。该数据旨在重新处理天然卫星天文测量，以消除空间相关的系统性偏差。
+      </p>
+    </section>
 
     <div v-if="!activeGroup" class="cbc-catalog-grid">
       <button
@@ -9,15 +14,19 @@
         type="button"
         class="cbc-catalog-card"
         @click="selectGroup(group)">
-        <span class="cbc-catalog-key">{{ group.key }}</span>
-        <span class="cbc-catalog-label">{{ group.label }}</span>
-        <span class="cbc-catalog-meta">{{ group.props.length }} 个字段</span>
+        <span class="cbc-catalog-main">
+          <span class="cbc-catalog-key">{{ group.key }}</span>
+          <span class="cbc-catalog-label">{{ group.label }}</span>
+        </span>
       </button>
     </div>
 
-    <div v-if="activeGroup" class="cbc-table-head">
-      <el-button size="small" icon="el-icon-back" @click="backToCatalogs">返回星表选择</el-button>
-      <div class="cbc-active-catalog">
+    <div v-if="activeGroup" class="app-back-bar cbc-table-head">
+      <button type="button" class="app-back-button" @click="backToCatalogs">
+        <i class="el-icon-arrow-left"></i>
+        <span>返回星表选择</span>
+      </button>
+      <div class="app-back-context">
         当前星表 <strong>{{ activeGroup }}</strong>
       </div>
     </div>
@@ -442,17 +451,36 @@ export default {
 
 <style scoped>
 .cbc-container {
-  padding: 16px 20px;
+  padding: 24px 32px 40px;
   display: flex;
   flex-direction: column;
   height: 100%;
   box-sizing: border-box;
 }
 
+.cbc-head-panel {
+  margin-bottom: 20px;
+  padding: 24px 28px;
+  border: 1px solid #ebeef5;
+  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
 .cbc-title {
-  margin: 0 0 12px;
-  font-size: 18px;
-  color: #303133;
+  margin: 0 0 18px;
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.cbc-summary {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.9;
+  color: #606266;
+  text-indent: 2em;
 }
 
 .cbc-filter-bar {
@@ -469,76 +497,61 @@ export default {
 
 .cbc-catalog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px 16px;
   align-content: start;
   overflow-y: auto;
-  padding: 4px 0;
+  padding: 2px 0 4px;
 }
 
 .cbc-catalog-card {
-  min-height: 96px;
-  padding: 14px 16px;
-  border: 1px solid #dcdfe6;
-  border-radius: 6px;
+  min-height: 90px;
+  padding: 16px 18px;
+  border: 1px solid #ebeef5;
+  border-radius: 8px;
   background: #fff;
   color: #303133;
   cursor: pointer;
   text-align: left;
-  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+  display: block;
+  transition: all 0.25s ease;
 }
 
 .cbc-catalog-card:hover,
 .cbc-catalog-card:focus {
-  border-color: #409EFF;
-  box-shadow: 0 8px 20px rgba(64, 158, 255, .14);
+  border-color: #c6e2ff;
+  box-shadow: 0 4px 14px rgba(64, 158, 255, 0.15);
   outline: none;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+}
+
+.cbc-catalog-main {
+  min-width: 0;
 }
 
 .cbc-catalog-key,
-.cbc-catalog-label,
-.cbc-catalog-meta {
+.cbc-catalog-label {
   display: block;
 }
 
 .cbc-catalog-key {
-  font-size: 20px;
-  line-height: 26px;
+  font-size: 22px;
+  line-height: 28px;
   font-weight: 600;
   color: #303133;
   word-break: break-all;
 }
 
 .cbc-catalog-label {
-  margin-top: 8px;
+  margin-top: 9px;
   font-size: 13px;
+  line-height: 18px;
   color: #606266;
-}
-
-.cbc-catalog-meta {
-  margin-top: 6px;
-  font-size: 12px;
-  color: #909399;
 }
 
 .cbc-table-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
   margin-bottom: 12px;
-}
-
-.cbc-active-catalog {
-  font-size: 13px;
-  color: #606266;
-}
-
-.cbc-active-catalog strong {
-  margin-left: 6px;
-  font-size: 16px;
-  color: #303133;
+  flex-shrink: 0;
 }
 
 .cbc-map-panel {

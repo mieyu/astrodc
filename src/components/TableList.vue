@@ -1,9 +1,15 @@
 <template>
   <div class="table-list-container">
-    <div class="toolbar-container">
-      <div class="back-link-container">
-        <el-button size="small" icon="el-icon-back" @click="goBack" plain>返回</el-button>
-        <el-button size="small" icon="el-icon-download" @click="download" plain>下载</el-button>
+    <div class="app-back-bar toolbar-container">
+      <button type="button" class="app-back-button" @click="goBack">
+        <i class="el-icon-arrow-left"></i>
+        <span>返回上一页</span>
+      </button>
+      <div class="app-back-actions">
+        <button type="button" class="app-back-button app-back-secondary" @click="download">
+          <i class="el-icon-download"></i>
+          <span>下载</span>
+        </button>
       </div>
     </div>
 
@@ -310,16 +316,7 @@ export default {
 }
 
 .toolbar-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 10px;
-  padding: 5px 0;
-}
-
-.back-link-container {
-  display: flex;
-  gap: 8px;
 }
 
 .el-table {

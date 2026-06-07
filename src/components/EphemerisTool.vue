@@ -1,8 +1,11 @@
 <template>
   <div class="ephemeris-page">
-    <div class="back-link-container">
-      <a href="#" class="el-icon-back" @click.prevent="goBack"></a>
-      <div class="header-clock">
+    <div class="app-back-bar">
+      <button type="button" class="app-back-button" @click="goBack">
+        <i class="el-icon-arrow-left"></i>
+        <span>返回上一页</span>
+      </button>
+      <div class="app-back-context header-clock">
         <span class="clock-dot"></span>
         UTC: <span class="clock-text">{{ utcClock }}</span>
       </div>
@@ -483,25 +486,6 @@ export default {
   margin: 0 auto;
 }
 
-.back-link-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.back-link-container .el-icon-back {
-  font-size: 22px;
-  color: #409EFF;
-  cursor: pointer;
-  text-decoration: none;
-  transition: transform 0.2s ease;
-}
-
-.back-link-container .el-icon-back:hover {
-  transform: translateX(-4px);
-}
-
 .header-clock {
   display: inline-flex;
   align-items: center;
@@ -511,7 +495,7 @@ export default {
   color: #606266;
   background: #f5f7fa;
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: 6px;
 }
 
 .clock-dot {
