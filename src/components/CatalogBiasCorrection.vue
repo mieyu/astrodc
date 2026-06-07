@@ -2,7 +2,47 @@
   <div class="cbc-container">
     <h2 class="cbc-title">星表偏差修正表</h2>
 
-    <el-form :inline="true" :model="filters" class="cbc-filter-bar" size="small">
+    <div v-if="!activeGroup" class="cbc-catalog-grid">
+      <button
+        v-for="group in columnGroups"
+        :key="group.key"
+        type="button"
+        class="cbc-catalog-card"
+        @click="selectGroup(group)">
+        <span class="cbc-catalog-key">{{ group.key }}</span>
+        <span class="cbc-catalog-label">{{ group.label }}</span>
+        <span class="cbc-catalog-meta">{{ group.props.length }} 个字段</span>
+      </button>
+    </div>
+
+    <div v-if="activeGroup" class="cbc-table-head">
+      <el-button size="small" icon="el-icon-back" @click="backToCatalogs">返回星表选择</el-button>
+      <div class="cbc-active-catalog">
+        当前星表 <strong>{{ activeGroup }}</strong>
+      </div>
+    </div>
+
+    <section v-if="catalogMapSrc" class="cbc-map-panel">
+      <div class="cbc-map-head">
+        <div>
+          <h3>{{ activeGroup }} 系统偏差分布图</h3>
+          <span>{{ currentGroup ? currentGroup.label : activeGroup }}</span>
+        </div>
+        <el-button
+          size="small"
+          type="primary"
+          plain
+          icon="el-icon-view"
+          @click="openCatalogMap">
+          查看原图
+        </el-button>
+      </div>
+      <figure class="cbc-map-figure">
+        <img :src="catalogMapSrc" :alt="`${activeGroup} systematics map`">
+      </figure>
+    </section>
+
+    <el-form v-if="activeGroup" :inline="true" :model="filters" class="cbc-filter-bar" size="small">
       <el-form-item label="ipix 范围">
         <el-input-number v-model="filters.ipixMin" :controls="false" placeholder="起" style="width: 140px"></el-input-number>
         <span class="cbc-range-sep">—</span>
@@ -15,33 +55,8 @@
       </el-form-item>
     </el-form>
 
-    <div class="cbc-view-toolbar">
-      <el-radio-group v-model="viewMode" size="small" @change="onViewModeChange">
-        <el-radio-button label="core">概览视图</el-radio-button>
-        <el-radio-button label="grouped">字段分组</el-radio-button>
-      </el-radio-group>
-
-      <el-popover v-if="viewMode === 'core'" placement="bottom-end" width="320" trigger="click" popper-class="cbc-col-popper">
-        <div class="cbc-col-popover">
-          <div class="cbc-col-popover-head">
-            <span>更多列</span>
-            <el-button type="text" size="mini" @click="resetExtraColumns">清空</el-button>
-          </div>
-          <div class="cbc-col-popover-body">
-            <el-checkbox-group v-model="extraColumns" @change="persistExtraColumns">
-              <el-checkbox v-for="col in extraColumnCandidates" :key="col" :label="col" class="cbc-col-checkbox">{{ col }}</el-checkbox>
-            </el-checkbox-group>
-          </div>
-        </div>
-        <el-button slot="reference" size="small" plain icon="el-icon-s-grid">更多列 ({{ extraColumns.length }})</el-button>
-      </el-popover>
-    </div>
-
-    <el-tabs v-if="viewMode === 'grouped'" v-model="activeGroup" class="cbc-group-tabs" type="card">
-      <el-tab-pane v-for="group in columnGroups" :key="group.key" :label="group.label" :name="group.key"></el-tab-pane>
-    </el-tabs>
-
     <el-table
+      v-if="activeGroup"
       ref="cbcTable"
       :data="tableData"
       v-loading="loading"
@@ -73,6 +88,7 @@
     </el-table>
 
     <el-pagination
+      v-if="activeGroup"
       class="cbc-pagination"
       background
       layout="total, sizes, prev, pager, next, jumper"
@@ -106,7 +122,7 @@
           </el-descriptions>
         </div>
 
-        <div v-for="group in columnGroups" :key="group.key" class="cbc-detail-group">
+        <div v-for="group in detailGroups" :key="group.key" class="cbc-detail-group">
           <h4>{{ group.label }}</h4>
           <el-descriptions :column="2" border size="small">
             <el-descriptions-item v-for="prop in group.props" :key="prop" :label="prop">
@@ -142,6 +158,8 @@ const CATALOGS = [
   { key: 'yale', label: 'Yale' }
 ];
 
+const CATALOG_MAP_KEYS = CATALOGS.map(catalog => catalog.key);
+
 const METRICS = ['dra_mas', 'ddec_mas', 'pmra_masyr', 'pmdec_masyr'];
 
 const FALLBACK_GROUPS = CATALOGS.map(catalog => ({
@@ -161,21 +179,6 @@ const FALLBACK_COLUMNS = [
   })))
 ];
 
-const CORE_COLUMN_PROPS = [
-  'ipix',
-  'gaiadr2_dra_mas',
-  'gaiadr2_ddec_mas',
-  'gaiadr2_pmra_masyr',
-  'gaiadr2_pmdec_masyr',
-  'tycho2_dra_mas',
-  'tycho2_ddec_mas',
-  'ucac4_dra_mas',
-  'ucac4_ddec_mas'
-];
-
-const LS_KEY_EXTRA = 'cbc_extra_columns';
-const LS_KEY_VIEW = 'cbc_view_mode';
-
 export default {
   name: 'CatalogBiasCorrection',
   data() {
@@ -186,9 +189,7 @@ export default {
       },
       allColumns: FALLBACK_COLUMNS,
       columnGroups: FALLBACK_GROUPS,
-      viewMode: 'core',
-      activeGroup: 'ac',
-      extraColumns: [],
+      activeGroup: '',
       tableData: [],
       total: 0,
       page: 1,
@@ -202,16 +203,19 @@ export default {
     };
   },
   computed: {
-    extraColumnCandidates() {
-      return this.allColumns.map(c => c.prop).filter(p => !CORE_COLUMN_PROPS.includes(p));
+    currentGroup() {
+      return this.columnGroups.find(g => g.key === this.activeGroup) || null;
     },
     currentColumns() {
-      if (this.viewMode === 'core') {
-        const props = [...CORE_COLUMN_PROPS, ...this.extraColumns];
-        return props.map(p => this.findColumn(p)).filter(Boolean);
-      }
-      const group = this.columnGroups.find(g => g.key === this.activeGroup) || this.columnGroups[0];
-      return ['ipix', ...group.props].map(p => this.findColumn(p)).filter(Boolean);
+      if (!this.currentGroup) return [];
+      return ['ipix', ...this.currentGroup.props].map(p => this.findColumn(p)).filter(Boolean);
+    },
+    detailGroups() {
+      return this.currentGroup ? [this.currentGroup] : this.columnGroups;
+    },
+    catalogMapSrc() {
+      if (!CATALOG_MAP_KEYS.includes(this.activeGroup)) return '';
+      return `${process.env.BASE_URL}catalog-bias-maps/${this.activeGroup}_systematics_map.png`;
     }
   },
   watch: {
@@ -223,22 +227,15 @@ export default {
     }
   },
   async created() {
-    this.restoreFromStorage();
     this.restoreFromQuery();
     await this.fetchColumns();
-    this.fetchList();
+    if (this.activeGroup) {
+      this.fetchList();
+    }
   },
   methods: {
     findColumn(prop) {
       return this.allColumns.find(c => c.prop === prop);
-    },
-    restoreFromStorage() {
-      try {
-        const extra = JSON.parse(localStorage.getItem(LS_KEY_EXTRA) || '[]');
-        if (Array.isArray(extra)) this.extraColumns = extra;
-        const v = localStorage.getItem(LS_KEY_VIEW);
-        if (v === 'core' || v === 'grouped') this.viewMode = v;
-      } catch (e) { /* ignore */ }
     },
     restoreFromQuery() {
       const q = this.$route.query;
@@ -248,7 +245,6 @@ export default {
       if (q.pageSize) this.pageSize = Number(q.pageSize) || 50;
       if (q.sortField) this.sortField = String(q.sortField);
       if (q.sortOrder === 'asc' || q.sortOrder === 'desc') this.sortOrder = q.sortOrder;
-      if (q.viewMode === 'core' || q.viewMode === 'grouped') this.viewMode = q.viewMode;
       if (q.group) this.activeGroup = String(q.group);
     },
     syncQuery() {
@@ -261,8 +257,7 @@ export default {
       q.pageSize = this.pageSize;
       q.sortField = this.sortField;
       q.sortOrder = this.sortOrder;
-      q.viewMode = this.viewMode;
-      if (this.viewMode === 'grouped') q.group = this.activeGroup;
+      if (this.activeGroup) q.group = this.activeGroup;
       this.$router.replace({ path: this.$route.path, query: q }).catch(() => {});
     },
     buildBody() {
@@ -290,12 +285,15 @@ export default {
             this.columnGroups = data.data.groups;
           }
         }
-        this.extraColumns = this.extraColumns.filter(p => this.extraColumnCandidates.includes(p));
-        if (!this.columnGroups.find(g => g.key === this.activeGroup)) {
-          this.activeGroup = this.columnGroups[0].key;
+        if (this.activeGroup && !this.columnGroups.find(g => g.key === this.activeGroup)) {
+          this.activeGroup = '';
+          this.syncQuery();
         }
       } catch (e) {
-        this.extraColumns = this.extraColumns.filter(p => this.extraColumnCandidates.includes(p));
+        if (this.activeGroup && !this.columnGroups.find(g => g.key === this.activeGroup)) {
+          this.activeGroup = '';
+          this.syncQuery();
+        }
       }
     },
     async fetchList() {
@@ -318,6 +316,7 @@ export default {
       }
     },
     handleSearch() {
+      if (!this.activeGroup) return;
       this.page = 1;
       this.syncQuery();
       this.fetchList();
@@ -353,17 +352,27 @@ export default {
       this.syncQuery();
       this.fetchList();
     },
-    onViewModeChange() {
-      try { localStorage.setItem(LS_KEY_VIEW, this.viewMode); } catch (e) {}
+    selectGroup(group) {
+      this.activeGroup = group.key;
+      this.page = 1;
+      this.sortField = 'ipix';
+      this.sortOrder = 'asc';
       this.syncQuery();
-      this.relayoutTable();
+      this.fetchList();
     },
-    persistExtraColumns() {
-      try { localStorage.setItem(LS_KEY_EXTRA, JSON.stringify(this.extraColumns)); } catch (e) {}
+    backToCatalogs() {
+      this.activeGroup = '';
+      this.page = 1;
+      this.tableData = [];
+      this.total = 0;
+      this.detailVisible = false;
+      this.detailRow = null;
+      this.syncQuery();
     },
-    resetExtraColumns() {
-      this.extraColumns = [];
-      this.persistExtraColumns();
+    openCatalogMap() {
+      if (this.catalogMapSrc) {
+        window.open(this.catalogMapSrc, '_blank', 'noopener');
+      }
     },
     relayoutTable() {
       this.$nextTick(() => {
@@ -408,9 +417,7 @@ export default {
       this.exporting = true;
       try {
         const body = this.buildBody();
-        body.columns = this.viewMode === 'core'
-          ? [...CORE_COLUMN_PROPS, ...this.extraColumns]
-          : ['ipix', ...(this.columnGroups.find(g => g.key === this.activeGroup) || this.columnGroups[0]).props];
+        body.columns = this.currentColumns.map(c => c.prop);
         const response = await axios.post('/api/catalog-bias-correction/export', body, { responseType: 'blob' });
         const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8' });
         const url = URL.createObjectURL(blob);
@@ -460,19 +467,129 @@ export default {
   color: #909399;
 }
 
-.cbc-view-toolbar {
+.cbc-catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+  align-content: start;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.cbc-catalog-card {
+  min-height: 96px;
+  padding: 14px 16px;
+  border: 1px solid #dcdfe6;
+  border-radius: 6px;
+  background: #fff;
+  color: #303133;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.cbc-catalog-card:hover,
+.cbc-catalog-card:focus {
+  border-color: #409EFF;
+  box-shadow: 0 8px 20px rgba(64, 158, 255, .14);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.cbc-catalog-key,
+.cbc-catalog-label,
+.cbc-catalog-meta {
+  display: block;
+}
+
+.cbc-catalog-key {
+  font-size: 20px;
+  line-height: 26px;
+  font-weight: 600;
+  color: #303133;
+  word-break: break-all;
+}
+
+.cbc-catalog-label {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #606266;
+}
+
+.cbc-catalog-meta {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #909399;
+}
+
+.cbc-table-head {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
-.cbc-group-tabs {
-  margin-bottom: 8px;
+.cbc-active-catalog {
+  font-size: 13px;
+  color: #606266;
 }
 
-.cbc-group-tabs >>> .el-tabs__header {
-  margin-bottom: 0;
+.cbc-active-catalog strong {
+  margin-left: 6px;
+  font-size: 16px;
+  color: #303133;
+}
+
+.cbc-map-panel {
+  flex-shrink: 0;
+  margin-bottom: 12px;
+  border: 1px solid #dcdfe6;
+  border-radius: 6px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.cbc-map-head {
+  min-height: 48px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.cbc-map-head h3 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 20px;
+  color: #303133;
+}
+
+.cbc-map-head span {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 18px;
+  color: #909399;
+}
+
+.cbc-map-figure {
+  margin: 0;
+  padding: 10px;
+  max-height: 58vh;
+  overflow: auto;
+  background: #fafafa;
+}
+
+.cbc-map-figure img {
+  display: block;
+  width: 100%;
+  min-width: 760px;
+  height: auto;
+  border: 1px solid #ebeef5;
+  background: #fff;
 }
 
 .cbc-table {
@@ -499,42 +616,6 @@ export default {
 .cbc-pagination {
   margin-top: 12px;
   text-align: right;
-}
-
-.cbc-col-popover {
-  display: flex;
-  flex-direction: column;
-  max-height: 420px;
-}
-
-.cbc-col-popover-head {
-  flex-shrink: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid #ebeef5;
-  font-weight: 500;
-  color: #606266;
-}
-
-.cbc-col-popover-body {
-  flex: 1;
-  overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.cbc-col-popover-body::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
-}
-
-.cbc-col-checkbox {
-  display: block;
-  margin: 4px 0 !important;
 }
 
 .cbc-detail {
