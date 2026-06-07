@@ -31,8 +31,7 @@ server:
   port: 8088 # 项目启动端口
 
 file:
-  root-path: /media/miemieyu/work/Observated_images # 文件存储根路径（Linux环境）
-  # root-path: /Volumes/work/Observated_images # Mac环境路径（注释备用）
+  root-path: ${ASTRONOMY_FILE_ROOT:./Observated_images} # 文件存储根路径，可通过环境变量覆盖
 
 deepseek:
   api-key: sk-5c80920be9644e87adef23788933bdd6

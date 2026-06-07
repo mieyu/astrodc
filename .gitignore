@@ -1,6 +1,9 @@
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
+.DS_Store
+._*
+.codex-*.log
 !**/src/main/**/target/
 !**/src/test/**/target/
 
