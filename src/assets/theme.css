@@ -1,0 +1,135 @@
+/* ==========================================================================
+   全站设计基准 (Design Tokens)
+   统一配色、圆角、阴影与排版，配合各组件局部样式形成一致的简约风格。
+   ========================================================================== */
+:root {
+  /* 品牌 / 强调色 —— 与 Element UI 默认蓝保持一致 */
+  --brand: #409eff;
+  --brand-dark: #337ecc;
+  --brand-soft: #ecf5ff;
+
+  /* 文字层级 */
+  --text-strong: #2c3e50;
+  --text-primary: #303133;
+  --text-regular: #606266;
+  --text-muted: #909399;
+  --text-placeholder: #c0c4cc;
+
+  /* 线条与背景 */
+  --border: #ebeef5;
+  --border-strong: #e4e7ed;
+  --bg-page: #f7f8fa;
+  --bg-elevated: #ffffff;
+  --bg-subtle: #fafbfc;
+
+  /* 圆角 */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+
+  /* 阴影 —— 克制、柔和，不夸张 */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.08);
+  --shadow-brand: 0 4px 14px rgba(64, 158, 255, 0.16);
+}
+
+/* ----- 基础排版 ----- */
+html,
+body {
+  background-color: var(--bg-page);
+}
+
+#app {
+  color: var(--text-strong);
+}
+
+/* ----- 统一的内容卡片 ----- */
+.ui-card {
+  padding: 24px 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow);
+  box-sizing: border-box;
+}
+
+/* 卡片标题：左侧细色条 + 标题，简约统一 */
+.ui-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-strong);
+  margin: 0 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ==========================================================================
+   Element UI 全局微调 —— 让基础组件圆角/阴影/描边保持一致
+   ========================================================================== */
+.el-button {
+  border-radius: var(--radius-sm);
+}
+
+.el-input__inner,
+.el-textarea__inner {
+  border-radius: var(--radius-sm);
+}
+
+.el-card {
+  border-radius: var(--radius);
+  border-color: var(--border);
+  box-shadow: var(--shadow) !important;
+}
+
+/* 表格：浅色表头 + 柔和分隔，去掉沉重感 */
+.el-table th.el-table__cell {
+  background-color: var(--bg-subtle);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.el-table {
+  color: var(--text-regular);
+}
+
+/* 弹窗与下拉的圆角统一 */
+.el-dialog {
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.el-message-box {
+  border-radius: var(--radius);
+}
+
+.el-popper,
+.el-select-dropdown,
+.el-dropdown-menu {
+  border-radius: var(--radius-sm);
+}
+
+/* 选中文本与链接 */
+::selection {
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+}
+
+/* ----- 全局细滚动条 ----- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d8dde6;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c4ccd8;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}

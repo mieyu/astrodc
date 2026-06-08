@@ -335,11 +335,18 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
+  padding: 16px 20px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 .header-container h2 {
   margin: 0;
+  font-size: 18px;
+  color: var(--text-strong);
 }
 
 .total-count {
@@ -358,10 +365,11 @@ export default {
 .left-panel,
 .right-panel {
   flex: 1;
-  background: #fff;
-  border-radius: 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 20px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
 }
 
 .panel-header {
@@ -401,15 +409,15 @@ export default {
 }
 
 .stat-item {
-  border: 1px solid #ebeef5;
-  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 15px;
-  transition: all 0.3s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .stat-item:hover {
-  border-color: #409EFF;
-  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.1);
+  border-color: var(--brand);
+  box-shadow: var(--shadow-brand);
 }
 
 .stat-label {

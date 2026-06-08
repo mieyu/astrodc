@@ -62,9 +62,9 @@ assert(
   source.indexOf('class="cbc-summary"') < source.indexOf('class="cbc-catalog-grid"'),
   'Catalog bias title and summary should appear together above the data area.'
 );
-assert(headPanelStyle.includes('border: 1px solid #ebeef5'), 'Catalog bias top panel should match the own images panel border.');
-assert(headPanelStyle.includes('border-radius: 8px'), 'Catalog bias top panel should match the own images panel radius.');
-assert(headPanelStyle.includes('background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)'), 'Catalog bias top panel should match the own images panel background.');
+assert(headPanelStyle.includes('border: 1px solid var(--border)'), 'Catalog bias top panel should match the shared panel border token.');
+assert(headPanelStyle.includes('border-radius: var(--radius)'), 'Catalog bias top panel should match the shared panel radius token.');
+assert(headPanelStyle.includes('background: var(--bg-elevated)'), 'Catalog bias top panel should use the shared elevated surface, not a gradient.');
 assert(!summaryStyle.includes('border:'), 'Catalog bias summary text should not be a separate bordered card inside the top panel.');
 assert(source.includes('catalogMapSrc'), 'Catalog bias page should compute a map image URL for the active catalog.');
 assert(source.includes('cbc-map-figure'), 'Catalog bias page should render the active catalog map figure.');

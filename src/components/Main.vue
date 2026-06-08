@@ -82,10 +82,10 @@ export default {
 
 .panel {
   padding: 24px 28px;
-  border: 1px solid #ebeef5;
-  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
 }
 
 .intro {

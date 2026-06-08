@@ -309,10 +309,16 @@ export default {
 <style scoped>
 .table-list-container {
   position: relative;
-  padding: 10px;
-  height: 100%;
+  margin: 18px 20px;
+  padding: 18px 20px;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 .toolbar-container {

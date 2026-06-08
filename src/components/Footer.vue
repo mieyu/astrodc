@@ -23,29 +23,29 @@ export default {
 
 <style scoped>
 .site-footer {
-  background-color: #2c3e50; /* 深色背景 */
-  color: #bdc3c7; /* 柔和的文字颜色 */
-  padding: 0 0 10px 0;
-  font-size: 14px;
+  background-color: #ffffff;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 16px 0;
+  font-size: 13px;
 }
 
 .footer-bottom {
   text-align: center;
-  padding-top: 10px;
 }
 
 .footer-bottom p {
-  margin: 5px 0;
+  margin: 4px 0;
 }
 
 .footer-bottom a {
-  color: #bdc3c7;
+  color: var(--text-regular);
   text-decoration: none;
   margin: 0 10px;
+  transition: color 0.18s ease;
 }
 
 .footer-bottom a:hover {
-  color: #ffffff;
-  text-decoration: underline;
+  color: var(--brand);
 }
 </style>

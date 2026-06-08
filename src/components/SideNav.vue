@@ -4,8 +4,8 @@
       :default-openeds="defaultOpeneds"
       class="side-nav"
       router
-      background-color="#f5f7fa"
-      text-color="#303133"
+      background-color="#ffffff"
+      text-color="#606266"
       active-text-color="#409EFF">
 
     <el-menu-item index="/">
@@ -93,11 +93,47 @@ export default {
 <style scoped>
 .side-nav {
   height: 100%;
-  border-right: 1px solid #e6e6e6;
+  border-right: none;
+  padding: 8px 10px;
+  box-sizing: border-box;
 }
 
 .side-nav:not(.el-menu--collapse) {
   width: 240px;
+}
+
+/* 菜单项：统一圆角，留出呼吸空间；长文案允许换行完整显示 */
+.side-nav >>> .el-menu-item,
+.side-nav >>> .el-submenu__title {
+  height: auto;
+  min-height: 42px;
+  line-height: 20px;
+  padding-top: 11px;
+  padding-bottom: 11px;
+  white-space: normal;
+  border-radius: var(--radius-sm);
+  margin: 2px 0;
+  display: flex;
+  align-items: center;
+}
+
+/* 让文字可收缩换行，避免长标题被截断 */
+.side-nav >>> .el-menu-item > span,
+.side-nav >>> .el-submenu__title > span {
+  min-width: 0;
+  flex: 1;
+}
+
+.side-nav >>> .el-menu-item:hover,
+.side-nav >>> .el-submenu__title:hover {
+  background-color: #f4f6fa !important;
+  color: var(--brand) !important;
+}
+
+/* 选中项：中性浅灰底 + 主色文字，克制不刺眼 */
+.side-nav >>> .el-menu-item.is-active {
+  background-color: #f0f2f5 !important;
+  font-weight: 600;
 }
 
 .side-nav >>> .el-submenu__icon-arrow {

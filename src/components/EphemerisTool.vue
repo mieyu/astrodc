@@ -554,7 +554,7 @@ export default {
   margin-bottom: 6px;
 }
 
-.fov-label { color: #8e44ad; font-weight: 600; }
+.fov-label { color: var(--brand); font-weight: 600; }
 
 .field-hint {
   font-size: 11px;
@@ -608,7 +608,7 @@ export default {
   background: #409EFF;
   color: #fff;
   border-color: #409EFF;
-  box-shadow: 0 2px 6px rgba(64, 158, 255, 0.4);
+  box-shadow: 0 2px 6px rgba(64, 158, 255, 0.22);
 }
 
 .satellite-divider {
@@ -718,7 +718,7 @@ export default {
   text-align: center;
 }
 
-.preview-loading i { font-size: 32px; color: #8b5cf6; }
+.preview-loading i { font-size: 32px; color: var(--brand); }
 .preview-error i { font-size: 32px; color: #f87171; }
 .preview-loading p,
 .preview-error p { margin: 10px 0 0; font-size: 13px; }

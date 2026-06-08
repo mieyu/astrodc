@@ -467,11 +467,16 @@ export default {
 
 <style scoped>
 .np-container {
-  padding: 16px 20px;
+  margin: 18px 20px;
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 0;
   box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 .np-title {

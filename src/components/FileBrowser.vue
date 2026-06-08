@@ -106,7 +106,13 @@ export default {
 
 <style scoped>
 .file-browser-container {
-  padding: 20px;
+  margin: 18px 20px;
+  padding: 18px 20px;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 .breadcrumb-path {
   display: flex;

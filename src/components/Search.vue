@@ -274,12 +274,12 @@ export default {
 /* 保留的快速查询和条件查询区域样式 */
 .quick-actions-section,
 .condition-section {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 30px;
-  margin-bottom: 30px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
 }
 
 .section-header {
@@ -318,23 +318,24 @@ export default {
 
 .quick-actions .el-button {
   min-width: 160px;
-  height: 48px;
-  font-size: 16px;
+  height: 44px;
+  font-size: 15px;
   font-weight: 500;
-  border-radius: 12px;
-  transition: all 0.3s ease;
+  border-radius: var(--radius-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .quick-actions .el-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-brand);
 }
 
 .table-container {
-  margin: 25px 0;
-  border-radius: 12px;
+  margin: 24px 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow);
 }
 
 .condition-table {
@@ -342,16 +343,15 @@ export default {
 }
 
 .condition-table .el-table__header {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: var(--bg-subtle);
 }
 
 .condition-table .el-table__row {
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease;
 }
 
 .condition-table .el-table__row:hover {
-  background-color: #f8f9fa;
-  transform: scale(1.01);
+  background-color: var(--bg-subtle);
 }
 
 .condition-table .el-checkbox {
@@ -380,16 +380,16 @@ export default {
 
 .action-buttons .el-button {
   min-width: 140px;
-  height: 44px;
+  height: 42px;
   font-size: 15px;
   font-weight: 500;
-  border-radius: 10px;
-  transition: all 0.3s ease;
+  border-radius: var(--radius-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .action-buttons .el-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-brand);
 }
 
 /* 按钮图标样式 */

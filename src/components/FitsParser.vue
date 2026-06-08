@@ -138,8 +138,14 @@ export default {
 <style scoped>
 .parser-container {
   position: relative;
-  padding: 20px;
+  margin: 18px 20px;
+  padding: 28px 24px;
   text-align: center;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 /* 上传区域样式 */

@@ -1,5 +1,5 @@
 <template>
-  <div class="cbc-container">
+  <div class="cbc-container" :class="{ 'cbc-table-mode': activeGroup }">
     <section v-if="!activeGroup" class="cbc-head-panel">
       <h2 class="cbc-title">星表偏差修正表</h2>
       <p class="cbc-summary">
@@ -454,17 +454,27 @@ export default {
   padding: 24px 32px 40px;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 0;
   box-sizing: border-box;
+}
+
+/* 表格详情视图：与其他数据页统一为白卡 + 画布留白 */
+.cbc-container.cbc-table-mode {
+  margin: 18px 20px;
+  padding: 18px 20px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 .cbc-head-panel {
   margin-bottom: 20px;
   padding: 24px 28px;
-  border: 1px solid #ebeef5;
-  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
 }
 
 .cbc-title {

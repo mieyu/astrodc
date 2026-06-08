@@ -7,8 +7,8 @@
         class="el-menu-right"
         mode="horizontal"
         @select="handleSelect"
-        background-color="#cdc2c2"
-        text-color="#303133"
+        background-color="#ffffff"
+        text-color="#606266"
         active-text-color="#409EFF">
       <el-menu-item index="paper">PAPER</el-menu-item>
       <el-menu-item index="home">首页</el-menu-item>
@@ -50,6 +50,57 @@ export default {
 </script>
 
 <style scoped>
-.header-container {display: flex;justify-content: space-between;align-items: center;background-color: #cacacf;width: 100%;height: 100%;padding: 0 20px;box-sizing: border-box;}
-.header-title {font-size: 20px;font-weight: bold;color: #303133;}
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  width: 100%;
+  height: 100%;
+  padding: 0 28px;
+  box-sizing: border-box;
+}
+
+.header-title {
+  position: relative;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-strong);
+  padding-left: 14px;
+}
+
+/* 标题左侧的品牌色细条 */
+.header-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 18px;
+  border-radius: 2px;
+  background: var(--brand);
+}
+
+/* 顶部导航：去掉默认底部粗边，改为细描边高亮 */
+.el-menu-right.el-menu--horizontal {
+  border-bottom: none;
+}
+
+.el-menu-right >>> .el-menu-item {
+  height: 60px;
+  line-height: 60px;
+  font-size: 14px;
+  border-bottom: 2px solid transparent;
+}
+
+.el-menu-right >>> .el-menu-item:hover {
+  background-color: transparent !important;
+  color: var(--brand) !important;
+}
+
+.el-menu-right >>> .el-menu-item.is-active {
+  border-bottom: 2px solid var(--brand);
+}
 </style>

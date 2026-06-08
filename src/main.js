@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
+import './assets/theme.css'
 import './assets/back-navigation.css'
 import axios from 'axios'
 import router from './router' // 导入路由

@@ -56,11 +56,11 @@ export default {
 html, body {
   margin: 0;
   padding: 0;
-  background-color: #fff;
+  background-color: #f7f8fa;
 }
 
 #app {
-  background-color: #fff;
+  background-color: #f7f8fa;
 }
 
 .app-container {
@@ -75,12 +75,8 @@ html, body {
 }
 
 .app-aside {
-  background-color: #f5f7fa;
-  position: sticky;
-  top: 60px; /* el-header 默认高度 60px,贴在 header 下方 */
-  align-self: flex-start;
-  height: calc(100vh - 60px);
-  overflow-y: auto;
+  background-color: #ffffff;
+  border-right: 1px solid #ebeef5;
   overflow-x: hidden;
   /* 隐藏滚动条但保留滚动能力 - Firefox */
   scrollbar-width: none;
@@ -106,7 +102,7 @@ html, body {
 .el-main {
   flex-grow: 1;
   padding: 0 !important;
-  background-color: #fff;
+  background-color: #f7f8fa;
   display: flex;
   flex-direction: column;
 }
@@ -121,12 +117,10 @@ html, body {
   padding-right: 0;
 }
 
-/* 确保 header 在最上层,sidebar 在它之下 */
+/* 顶栏：随页面正常滚动，不悬浮 */
 .el-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background-color: #cacacf;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ebeef5;
 }
 
 .app-aside {
@@ -143,21 +137,21 @@ html, body {
   position: fixed;
   bottom: 30px;
   right: 30px;
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  border: none;
+  border: 1px solid #ebeef5;
   background-color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
   cursor: pointer;
   padding: 8px;
-  transition: all 0.3s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
   z-index: 1000;
 }
 
 .global-robot-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(64, 158, 255, 0.25);
 }
 
 .global-robot-btn img {
