@@ -11,6 +11,7 @@ import AiAgent from '../components/AiAgent.vue'
 import OwnImagesHub from '../components/OwnImagesHub.vue'
 import Placeholder from '../components/Placeholder.vue'
 import EphemerisTool from '../components/EphemerisTool.vue'
+import ExposureCalculator from '../components/ExposureCalculator.vue'
 import NormalizedPositioning from '../components/NormalizedPositioning.vue'
 import CatalogBiasCorrection from '../components/CatalogBiasCorrection.vue'
 
@@ -61,7 +62,7 @@ const routes = [
 
     // 网站服务 - 占位
     { path: '/services/observation/ephemeris', name: 'EphemerisTool', component: EphemerisTool, meta: { title: '天然卫星星历与寻星图工具' } },
-    { path: '/services/observation/exposure-calculator', component: Placeholder, meta: { title: '曝光时间计算器' } },
+    { path: '/services/observation/exposure-calculator', name: 'ExposureCalculator', component: ExposureCalculator, meta: { title: '曝光时间计算器' } },
     { path: '/services/prediction/imcce-api', component: Placeholder, meta: { title: '历表位置 (IMCCE API 查询)' } },
     { path: '/services/prediction/jpl-de', component: Placeholder, meta: { title: 'JPL DE系列 + 卫星模型' } },
     { path: '/services/fits-parser', name: 'FitsParser', component: FitsParser, meta: { title: '解析FITS头文件' } },
