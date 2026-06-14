@@ -85,6 +85,43 @@ public class DeepSeekServiceImpl implements DeepSeekService {
         }
     }
 
+    @Override
+    public String chat(String systemPrompt, String userPrompt, double temperature) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(apiKey);
+
+            List<Map<String, String>> messages = new ArrayList<>();
+            if (systemPrompt != null && !systemPrompt.isBlank()) {
+                messages.add(Map.of("role", "system", "content", systemPrompt));
+            }
+            messages.add(Map.of("role", "user", "content", userPrompt));
+
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("model", model);
+            requestBody.put("temperature", temperature);
+            requestBody.put("messages", messages);
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+            ResponseEntity<String> response = restTemplate.exchange(
+                apiUrl, HttpMethod.POST, entity, String.class);
+
+            JsonNode rootNode = objectMapper.readTree(response.getBody());
+            JsonNode choices = rootNode.get("choices");
+            if (choices != null && choices.isArray() && choices.size() > 0) {
+                JsonNode message = choices.get(0).get("message");
+                if (message != null && message.get("content") != null) {
+                    return message.get("content").asText().trim();
+                }
+            }
+            return "";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     /**
      * 调用DeepSeek API
      */
