@@ -5,6 +5,10 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "deploy": "npm run test:api-config && npm run test:access-gate && npm run build && npx wrangler pages deploy dist --project-name astrodc --branch main --commit-dirty=true",
+    "test:api-config": "node scripts/verify-api-config.js",
+    "test:access-gate": "node scripts/verify-access-gate.js",
+    "test:deploy-script": "node scripts/verify-deploy-script.js",
     "test:catalog-bias-ui": "node scripts/verify-catalog-bias-ui.js",
     "test:back-navigation-ui": "node scripts/verify-back-navigation-ui.js"
   },

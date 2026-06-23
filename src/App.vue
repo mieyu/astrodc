@@ -1,40 +1,79 @@
 <template>
   <div id="app">
-    <el-container class="app-container">
-      <el-header>
-        <Header></Header>
-      </el-header>
-      <el-container class="body-container">
-        <el-aside width="240px" v-if="showSideNav" class="app-aside">
-          <SideNav></SideNav>
-        </el-aside>
-        <el-main>
-          <router-view></router-view>
-        </el-main>
-      </el-container>
-      <el-footer>
-        <Footer></Footer>
-      </el-footer>
-    </el-container>
-
-    <button
-        v-if="$route.path !== '/aiagent'"
-        class="global-robot-btn"
-        @click="$router.push('/aiagent')"
-        title="打开学术 AI 助手">
-      <div class="assistant-btn-content">
-        <svg class="assistant-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          <circle cx="9" cy="9" r="1.2" fill="currentColor"></circle>
-          <circle cx="15" cy="9" r="1.2" fill="currentColor"></circle>
-        </svg>
-        <span>学术 AI 助手</span>
+    <div v-if="checkingAccess" class="access-lock access-lock--checking">
+      <div class="access-panel">
+        <div class="access-mark">ADC</div>
+        <h1>正在验证访问权限</h1>
       </div>
-    </button>
+    </div>
+
+    <div v-else-if="!accessUnlocked" class="access-lock">
+      <form class="access-panel" @submit.prevent="unlockAccess">
+        <div class="access-mark">ADC</div>
+        <h1>天然卫星数据中心</h1>
+        <p>请输入访问密钥继续使用。</p>
+        <el-input
+            v-model="accessKey"
+            class="access-input"
+            placeholder="访问密钥"
+            show-password
+            autocomplete="current-password"
+            @keyup.enter.native="unlockAccess">
+        </el-input>
+        <el-button
+            class="access-submit"
+            type="primary"
+            native-type="submit"
+            :loading="unlocking"
+            :disabled="!accessKey.trim()">
+          进入网站
+        </el-button>
+        <p v-if="accessError" class="access-error">{{ accessError }}</p>
+      </form>
+    </div>
+
+    <template v-else>
+      <button class="access-logout-btn" type="button" title="锁定访问" @click="logoutAccess">
+        锁定
+      </button>
+
+      <el-container class="app-container">
+        <el-header>
+          <Header></Header>
+        </el-header>
+        <el-container class="body-container">
+          <el-aside width="240px" v-if="showSideNav" class="app-aside">
+            <SideNav></SideNav>
+          </el-aside>
+          <el-main>
+            <router-view></router-view>
+          </el-main>
+        </el-container>
+        <el-footer>
+          <Footer></Footer>
+        </el-footer>
+      </el-container>
+
+      <button
+          v-if="$route.path !== '/aiagent'"
+          class="global-robot-btn"
+          @click="$router.push('/aiagent')"
+          title="打开学术 AI 助手">
+        <div class="assistant-btn-content">
+          <svg class="assistant-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            <circle cx="9" cy="9" r="1.2" fill="currentColor"></circle>
+            <circle cx="15" cy="9" r="1.2" fill="currentColor"></circle>
+          </svg>
+          <span>学术 AI 助手</span>
+        </div>
+      </button>
+    </template>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import SideNav from "./components/SideNav";
@@ -44,10 +83,67 @@ export default {
   components: {
     Footer, Header, SideNav
   },
+  data() {
+    return {
+      checkingAccess: true,
+      accessUnlocked: false,
+      accessKey: '',
+      accessError: '',
+      unlocking: false
+    }
+  },
   computed: {
     showSideNav() {
       const hidden = ['/paper', '/aiagent'];
       return !hidden.includes(this.$route.path);
+    }
+  },
+  created() {
+    window.addEventListener('astronomy-access-required', this.requireAccess)
+    this.checkAccess()
+  },
+  beforeDestroy() {
+    window.removeEventListener('astronomy-access-required', this.requireAccess)
+  },
+  methods: {
+    async checkAccess() {
+      this.checkingAccess = true
+      try {
+        await axios.get('/api/access/me')
+        this.accessUnlocked = true
+        this.accessError = ''
+      } catch (err) {
+        this.accessUnlocked = false
+      } finally {
+        this.checkingAccess = false
+      }
+    },
+    async unlockAccess() {
+      const key = this.accessKey.trim()
+      if (!key) return
+      this.unlocking = true
+      this.accessError = ''
+      try {
+        await axios.post('/api/access/unlock', { key })
+        this.accessUnlocked = true
+        this.accessKey = ''
+      } catch (err) {
+        this.accessError = '密钥错误，请重新输入。'
+      } finally {
+        this.unlocking = false
+      }
+    },
+    async logoutAccess() {
+      try {
+        await axios.post('/api/access/logout')
+      } finally {
+        this.requireAccess()
+      }
+    },
+    requireAccess() {
+      this.checkingAccess = false
+      this.accessUnlocked = false
+      this.accessError = '访问已锁定，请输入密钥。'
     }
   }
 }
@@ -69,6 +165,95 @@ html, body {
 
 #app {
   background-color: #f7f8fa;
+}
+
+.access-lock {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+      linear-gradient(135deg, rgba(31, 78, 121, 0.08), rgba(60, 132, 147, 0.08)),
+      #f7f8fa;
+  box-sizing: border-box;
+}
+
+.access-lock--checking .access-panel {
+  min-height: 180px;
+}
+
+.access-panel {
+  width: min(420px, 100%);
+  background: #ffffff;
+  border: 1px solid #dfe6ee;
+  border-radius: 8px;
+  box-shadow: 0 14px 36px rgba(24, 52, 78, 0.14);
+  padding: 32px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.access-mark {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #1f4e79;
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.access-panel h1 {
+  margin: 0 0 10px;
+  color: #1f2d3d;
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.access-panel p {
+  margin: 0 0 20px;
+  color: #606f80;
+  font-size: 14px;
+}
+
+.access-input {
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.access-submit {
+  width: 100%;
+}
+
+.access-error {
+  margin: 14px 0 0 !important;
+  color: #d93025 !important;
+}
+
+.access-logout-btn {
+  position: fixed;
+  top: 15px;
+  right: 16px;
+  z-index: 1001;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid #dfe6ee;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #606266;
+  cursor: pointer;
+  font-size: 12px;
+  box-shadow: 0 4px 12px rgba(24, 52, 78, 0.08);
+}
+
+.access-logout-btn:hover {
+  color: #1f4e79;
+  border-color: #1f4e79;
 }
 
 .app-container {

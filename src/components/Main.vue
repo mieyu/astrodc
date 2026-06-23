@@ -87,15 +87,7 @@
           </div>
           <div class="about-item">
             <span class="about-label">联系邮件</span>
-            <span class="about-value">service@example.edu.cn</span>
-          </div>
-          <div class="about-item">
-            <span class="about-label">联系电话</span>
-            <span class="about-value">+86 (010) 00000000</span>
-          </div>
-          <div class="about-item">
-            <span class="about-label">通讯地址</span>
-            <span class="about-value">暂无</span>
+            <span class="about-value">zhejones@gmail.com</span>
           </div>
         </div>
         <p class="copyright">© 2026 向星而行团队. 保留所有权利.</p>

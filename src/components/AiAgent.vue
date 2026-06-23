@@ -99,6 +99,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'AiAgent',
   data() {
@@ -119,24 +121,17 @@ export default {
       this.result = null
       
       try {
-        const response = await fetch('http://10.126.126.2:8088/analyze', {
-          method: 'POST',
+        const response = await axios.post('/analyze', {
+          task: this.task
+        }, {
           headers: {
-            'Content-Type': 'application/json',
             'accept': 'application/json'
-          },
-          body: JSON.stringify({
-            task: this.task
-          })
+          }
         })
         
-        if (!response.ok) {
-          throw new Error(`HTTP错误! 状态: ${response.status}`)
-        }
-        
-        this.result = await response.json()
+        this.result = response.data
       } catch (err) {
-        this.error = `请求失败: ${err.message}。请确保后端服务运行在 http://10.126.126.2:8088`
+        this.error = `请求失败: ${err.message}。请确认后端服务 ${axios.defaults.baseURL || ''} 可访问`
       } finally {
         this.loading = false
       }

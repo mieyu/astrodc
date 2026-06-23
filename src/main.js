@@ -10,12 +10,21 @@ import router from './router' // 导入路由
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 
-// 本地访问接口
-// axios.defaults.baseURL = 'http://127.0.0.2:8088'
+const apiBaseUrl = process.env.VUE_APP_API_BASE_URL || 'http://localhost:8088'
+axios.defaults.baseURL = apiBaseUrl
+axios.defaults.withCredentials = true
 
-
-// 远程访问接口
-axios.defaults.baseURL = 'http://10.126.126.2:8088'
+axios.interceptors.response.use(
+    response => response,
+    error => {
+        const status = error && error.response ? error.response.status : null
+        const url = error && error.config && error.config.url ? error.config.url : ''
+        if (status === 401 && !url.startsWith('/api/access/')) {
+            window.dispatchEvent(new CustomEvent('astronomy-access-required'))
+        }
+        return Promise.reject(error)
+    }
+)
 
 new Vue({
     router, // 在Vue实例中注册路由
