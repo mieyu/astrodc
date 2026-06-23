@@ -6,7 +6,7 @@
       router
       background-color="#ffffff"
       text-color="#606266"
-      active-text-color="#409EFF">
+      active-text-color="#1f4e79">
 
     <el-menu-item index="/">
       <i class="el-icon-s-home"></i>

@@ -30,7 +30,7 @@
 .app-back-button:hover,
 .app-back-button:focus {
   background: #f2f5fa;
-  color: #409eff;
+  color: var(--brand);
   outline: none;
 }
 

@@ -244,17 +244,17 @@ export default {
             data: values,
             itemStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: '#83bff6' },
-                { offset: 0.5, color: '#188df0' },
-                { offset: 1, color: '#188df0' }
+                { offset: 0, color: '#4a7fae' },
+                { offset: 0.5, color: '#1f4e79' },
+                { offset: 1, color: '#1f4e79' }
               ])
             },
             emphasis: {
               itemStyle: {
                 color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                  { offset: 0, color: '#2378f7' },
-                  { offset: 0.7, color: '#2378f7' },
-                  { offset: 1, color: '#83bff6' }
+                  { offset: 0, color: '#143553' },
+                  { offset: 0.7, color: '#143553' },
+                  { offset: 1, color: '#4a7fae' }
                 ])
               }
             }
@@ -296,16 +296,16 @@ export default {
             smooth: true,
             lineStyle: {
               width: 3,
-              color: '#67C23A'
+              color: '#319795'
             },
             areaStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: 'rgba(103, 194, 58, 0.3)' },
-                { offset: 1, color: 'rgba(103, 194, 58, 0.05)' }
+                { offset: 0, color: 'rgba(49, 151, 149, 0.25)' },
+                { offset: 1, color: 'rgba(49, 151, 149, 0.02)' }
               ])
             },
             itemStyle: {
-              color: '#67C23A'
+              color: '#319795'
             }
           }
         ]
@@ -350,7 +350,7 @@ export default {
 }
 
 .total-count {
-  color: #409EFF;
+  color: var(--brand);
   font-size: 18px;
 }
 
@@ -391,7 +391,7 @@ export default {
 }
 
 .panel-header h3 i {
-  color: #409EFF;
+  color: var(--brand);
   font-size: 20px;
 }
 

@@ -40,7 +40,7 @@ export default {
 
 .placeholder-icon {
   font-size: 64px;
-  color: #409EFF;
+  color: var(--brand);
   margin-bottom: 20px;
 }
 

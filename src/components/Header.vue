@@ -9,7 +9,7 @@
         @select="handleSelect"
         background-color="#ffffff"
         text-color="#606266"
-        active-text-color="#409EFF">
+        active-text-color="#1f4e79">
       <el-menu-item index="paper">PAPER</el-menu-item>
       <el-menu-item index="home">首页</el-menu-item>
     </el-menu>
@@ -67,20 +67,7 @@ export default {
   font-weight: 700;
   letter-spacing: 0.5px;
   color: var(--text-strong);
-  padding-left: 14px;
-}
-
-/* 标题左侧的品牌色细条 */
-.header-title::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 18px;
-  border-radius: 2px;
-  background: var(--brand);
+  padding-left: 0;
 }
 
 /* 顶部导航：去掉默认底部粗边，改为细描边高亮 */

@@ -299,7 +299,7 @@ export default {
 }
 
 .section-header h2 i {
-  color: #409EFF;
+  color: var(--brand);
   font-size: 24px;
 }
 

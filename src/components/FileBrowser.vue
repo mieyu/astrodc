@@ -122,7 +122,7 @@ export default {
 }
 
 .breadcrumb-path a {
-  color: #409EFF;
+  color: var(--brand);
   text-decoration: none;
 }
 
@@ -133,7 +133,7 @@ export default {
 .file-link {
   margin-left: 10px;
   text-decoration: none;
-  color: #409EFF;
+  color: var(--brand);
 }
 .file-link:hover {
   text-decoration: underline;

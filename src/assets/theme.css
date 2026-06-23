@@ -3,10 +3,10 @@
    统一配色、圆角、阴影与排版，配合各组件局部样式形成一致的简约风格。
    ========================================================================== */
 :root {
-  /* 品牌 / 强调色 —— 与 Element UI 默认蓝保持一致 */
-  --brand: #409eff;
-  --brand-dark: #337ecc;
-  --brand-soft: #ecf5ff;
+  /* 品牌 / 强调色 —— 星空黛蓝 (Twilight Blue) */
+  --brand: #1f4e79;
+  --brand-dark: #143553;
+  --brand-soft: #f0f5fa;
 
   /* 文字层级 */
   --text-strong: #2c3e50;
@@ -31,7 +31,7 @@
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
   --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
   --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.08);
-  --shadow-brand: 0 4px 14px rgba(64, 158, 255, 0.16);
+  --shadow-brand: 0 4px 14px rgba(31, 78, 121, 0.16);
 }
 
 /* ----- 基础排版 ----- */
@@ -133,3 +133,90 @@ body {
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* ==========================================================================
+   Element UI Theme Global Overrides for Scholarly Twilight Blue
+   ========================================================================== */
+.el-button--primary {
+  background-color: var(--brand) !important;
+  border-color: var(--brand) !important;
+}
+.el-button--primary:hover, .el-button--primary:focus {
+  background-color: var(--brand-dark) !important;
+  border-color: var(--brand-dark) !important;
+}
+.el-button--primary.is-plain {
+  color: var(--brand) !important;
+  background-color: var(--brand-soft) !important;
+  border-color: var(--brand) !important;
+}
+.el-button--primary.is-plain:hover, .el-button--primary.is-plain:focus {
+  color: #ffffff !important;
+  background-color: var(--brand) !important;
+  border-color: var(--brand) !important;
+}
+.el-checkbox__input.is-checked .el-checkbox__inner,
+.el-checkbox__input.is-indeterminate .el-checkbox__inner {
+  background-color: var(--brand) !important;
+  border-color: var(--brand) !important;
+}
+.el-checkbox__input.is-checked + .el-checkbox__label {
+  color: var(--brand) !important;
+}
+.el-radio__input.is-checked .el-radio__inner {
+  border-color: var(--brand) !important;
+  background-color: var(--brand) !important;
+}
+.el-radio__input.is-checked + .el-radio__label {
+  color: var(--brand) !important;
+}
+.el-radio-button__orig-radio:checked + .el-radio-button__inner {
+  background-color: var(--brand) !important;
+  border-color: var(--brand) !important;
+  box-shadow: -1px 0 0 0 var(--brand) !important;
+}
+.el-select-dropdown__item.selected {
+  color: var(--brand) !important;
+}
+.el-input.is-active .el-input__inner, .el-input__inner:focus {
+  border-color: var(--brand) !important;
+}
+.el-textarea__inner:focus {
+  border-color: var(--brand) !important;
+}
+.el-pagination.is-background .el-pager li:not(.disabled).active {
+  background-color: var(--brand) !important;
+}
+.el-pagination.is-background .el-pager li:not(.disabled):hover {
+  color: var(--brand) !important;
+}
+.el-tabs__item.is-active {
+  color: var(--brand) !important;
+}
+.el-tabs__active-bar {
+  background-color: var(--brand) !important;
+}
+.el-menu--horizontal > .el-menu-item.is-active {
+  border-bottom-color: var(--brand) !important;
+  color: var(--brand) !important;
+}
+.el-menu-item.is-active {
+  color: var(--brand) !important;
+}
+.el-submenu.is-active .el-submenu__title {
+  border-bottom-color: var(--brand) !important;
+}
+.el-loading-spinner .path {
+  stroke: var(--brand) !important;
+}
+.el-loading-spinner .el-loading-text {
+  color: var(--brand) !important;
+}
+.result-table >>> .coord-cell,
+.np-table >>> .coord-cell,
+.cbc-table >>> .coord-cell {
+  font-family: Menlo, Consolas, monospace !important;
+  color: var(--brand) !important;
+  font-weight: 600 !important;
+}
+

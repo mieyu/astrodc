@@ -20,8 +20,16 @@
     <button
         v-if="$route.path !== '/aiagent'"
         class="global-robot-btn"
-        @click="$router.push('/aiagent')">
-      <img src="./resources/images/robot.png" alt="AI Agent">
+        @click="$router.push('/aiagent')"
+        title="打开学术 AI 助手">
+      <div class="assistant-btn-content">
+        <svg class="assistant-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          <circle cx="9" cy="9" r="1.2" fill="currentColor"></circle>
+          <circle cx="15" cy="9" r="1.2" fill="currentColor"></circle>
+        </svg>
+        <span>学术 AI 助手</span>
+      </div>
     </button>
   </div>
 </template>
@@ -132,31 +140,46 @@ html, body {
   height: auto !important;
 }
 
-/* 全局右下角 AI Agent 浮动按钮 */
+/* 全局右下角 AI Agent 浮动按钮：学术胶囊式，简约不浮夸 */
 .global-robot-btn {
   position: fixed;
   bottom: 30px;
   right: 30px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: 1px solid #ebeef5;
-  background-color: #fff;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 20px;
+  border: 1px solid var(--brand);
+  background-color: var(--brand);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(31, 78, 121, 0.2);
   cursor: pointer;
-  padding: 8px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease;
   z-index: 1000;
 }
 
 .global-robot-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 22px rgba(64, 158, 255, 0.25);
+  transform: translateY(-2px);
+  background-color: var(--brand-dark);
+  box-shadow: 0 6px 18px rgba(20, 53, 83, 0.3);
 }
 
-.global-robot-btn img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+.assistant-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.assistant-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  transition: transform 0.22s ease;
+}
+
+.global-robot-btn:hover .assistant-icon {
+  transform: scale(1.1);
 }
 </style>

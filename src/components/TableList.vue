@@ -370,7 +370,7 @@ export default {
 
 .file-link {
   text-decoration: none;
-  color: #409EFF;
+  color: var(--brand);
   cursor: pointer;
   font-size: 12px;
 }

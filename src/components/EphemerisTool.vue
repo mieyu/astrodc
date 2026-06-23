@@ -527,7 +527,7 @@ export default {
   margin: 0 0 6px 0;
 }
 
-.page-header h2 i { color: #409EFF; font-size: 24px; }
+.page-header h2 i { color: var(--brand); font-size: 24px; }
 .page-header p { color: #909399; font-size: 12px; margin: 0; }
 
 .main-row { margin-top: 8px; }
@@ -537,7 +537,7 @@ export default {
   font-weight: 600;
   color: #303133;
 }
-.card-title i { color: #409EFF; margin-right: 6px; }
+.card-title i { color: var(--brand); margin-right: 6px; }
 
 /* 参数面板 */
 .param-card { border-radius: 10px; }
@@ -600,15 +600,15 @@ export default {
 }
 
 .sat-pill:hover span {
-  border-color: #409EFF;
-  color: #409EFF;
+  border-color: var(--brand);
+  color: var(--brand);
 }
 
 .sat-pill.active span {
-  background: #409EFF;
+  background: var(--brand);
   color: #fff;
-  border-color: #409EFF;
-  box-shadow: 0 2px 6px rgba(64, 158, 255, 0.22);
+  border-color: var(--brand);
+  box-shadow: var(--shadow-brand);
 }
 
 .satellite-divider {

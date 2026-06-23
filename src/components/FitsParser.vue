@@ -172,8 +172,8 @@ export default {
 }
 
 .upload-dragger .el-upload-dragger:hover {
-  border-color: #409EFF;
-  background: #f0f9ff;
+  border-color: var(--brand);
+  background: var(--brand-soft);
 }
 
 .upload-content {
@@ -193,7 +193,7 @@ export default {
 }
 
 .upload-dragger:hover .upload-icon {
-  color: #409EFF;
+  color: var(--brand);
 }
 
 .upload-text {
@@ -215,7 +215,7 @@ export default {
 }
 
 .click-text {
-  color: #409EFF;
+  color: var(--brand);
   font-weight: 500;
   cursor: pointer;
 }

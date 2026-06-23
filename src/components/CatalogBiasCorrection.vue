@@ -668,8 +668,8 @@ export default {
 .cbc-detail-group h4 {
   margin: 0 0 8px;
   font-size: 13px;
-  color: #409EFF;
-  border-left: 3px solid #409EFF;
+  color: var(--brand);
+  border-left: 3px solid var(--brand);
   padding-left: 8px;
 }
 

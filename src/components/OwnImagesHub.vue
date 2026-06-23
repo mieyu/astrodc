@@ -152,8 +152,8 @@ export default {
 }
 
 .entry:hover {
-  border-color: #c6e2ff;
-  box-shadow: 0 4px 14px rgba(64, 158, 255, 0.15);
+  border-color: var(--brand);
+  box-shadow: var(--shadow-brand);
   transform: translateY(-2px);
 }
 
@@ -171,7 +171,7 @@ export default {
 
 .entry-arrow {
   font-size: 18px;
-  color: #409eff;
+  color: var(--brand);
   flex-shrink: 0;
   margin-left: 16px;
 }

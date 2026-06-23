@@ -22,10 +22,13 @@
             <span class="paper-count">共 {{ papers.length }} 篇</span>
           </div>
           <el-table :data="papers" :height="tableHeight" stripe class="paper-table">
-            <el-table-column prop="title" label="GB/T" min-width="220"></el-table-column>
-            <el-table-column label="论文链接" min-width="320">
+            <el-table-column prop="title" label="GB/T" min-width="460"></el-table-column>
+            <el-table-column label="论文链接" min-width="260">
               <template v-slot:default="scope">
-                <a :href="scope.row.paperLink" target="_blank" class="paper-link">{{ scope.row.paperLink }}</a>
+                <a :href="scope.row.paperLink" target="_blank" class="paper-link">
+                  <i class="el-icon-link link-icon"></i>
+                  <span>{{ scope.row.paperLink }}</span>
+                </a>
               </template>
             </el-table-column>
             <el-table-column prop="date" label="年份" width="120" align="center"></el-table-column>
@@ -51,7 +54,7 @@ export default {
       galaxies: [], // galaxy分类列表
       activeGalaxy: '', // 当前选中的galaxy
       papers: [], // 当前galaxy下的paper列表
-      tableHeight: 420, // 表格固定可视高度，避免不同分类页面忽长忽短
+      tableHeight: 500, // 表格固定可视高度，避免不同分类页面忽长忽短
     };
   },
   created() {
@@ -67,7 +70,7 @@ export default {
   methods: {
     // 根据视口高度计算表格可视高度，保持各分类页面整体高度一致
     updateTableHeight() {
-      this.tableHeight = Math.max(300, window.innerHeight - 300);
+      this.tableHeight = Math.max(500, window.innerHeight - 200);
     },
     // 获取galaxy分类
     async fetchGalaxies() {
@@ -106,13 +109,14 @@ export default {
 
 <style scoped>
 .paper-page {
-  padding: 18px 20px;
+  padding: 24px 32px 40px;
   box-sizing: border-box;
+  background-color: var(--bg-page);
 }
 
 .paper-card {
   display: flex;
-  background: #ffffff;
+  background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -121,18 +125,22 @@ export default {
 
 /* 左侧分类导航 */
 .paper-aside {
-  width: 200px;
+  width: 220px;
   flex-shrink: 0;
   border-right: 1px solid var(--border);
-  padding: 12px 10px;
+  padding: 16px 12px;
   box-sizing: border-box;
+  background: var(--bg-subtle);
 }
 
 .paper-aside-title {
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 600;
   letter-spacing: 0.5px;
-  color: var(--text-muted);
-  padding: 6px 10px 10px;
+  color: var(--text-strong);
+  padding: 4px 10px 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
 }
 
 .paper-menu {
@@ -144,41 +152,50 @@ export default {
   height: 40px;
   line-height: 40px;
   border-radius: var(--radius-sm);
-  margin: 2px 0;
+  margin: 4px 0;
   color: var(--text-regular);
+  font-size: 13.5px;
+  padding-left: 12px !important;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
 }
 
 .paper-menu >>> .el-menu-item:hover {
-  background-color: #f4f6fa;
-  color: var(--brand);
+  background-color: var(--bg-elevated) !important;
+  color: var(--brand) !important;
+  box-shadow: var(--shadow-sm);
 }
 
 .paper-menu >>> .el-menu-item.is-active {
-  background-color: #f0f2f5;
-  color: var(--brand);
+  background-color: var(--brand-soft) !important;
+  color: var(--brand) !important;
   font-weight: 600;
+  box-shadow: var(--shadow-sm);
 }
 
 /* 右侧内容区 */
 .paper-main {
   flex: 1;
   min-width: 0;
-  padding: 20px 24px;
+  padding: 24px 30px;
+  background: var(--bg-elevated);
 }
 
 .paper-main-head {
   display: flex;
   align-items: baseline;
   gap: 12px;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
   border-bottom: 1px solid var(--border);
 }
 
 .paper-main-head h2 {
   margin: 0;
-  font-size: 18px;
+  font-size: 20px;
   color: var(--text-strong);
+  font-weight: 600;
 }
 
 .paper-count {
@@ -186,14 +203,31 @@ export default {
   color: var(--text-muted);
 }
 
+.paper-table {
+  width: 100%;
+}
+
 .paper-link {
   color: var(--brand);
   text-decoration: none;
   word-break: break-all;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.paper-link .link-icon {
+  font-size: 14px;
+  color: var(--text-muted);
+  transition: color 0.2s;
 }
 
 .paper-link:hover {
   text-decoration: underline;
+}
+
+.paper-link:hover .link-icon {
+  color: var(--brand);
 }
 
 /* 空状态 */
@@ -206,13 +240,24 @@ export default {
 }
 
 .paper-empty i {
-  font-size: 48px;
-  color: #dcdfe6;
-  margin-bottom: 12px;
+  font-size: 54px;
+  color: var(--border-strong);
+  margin-bottom: 14px;
 }
 
 .paper-empty p {
   margin: 0;
   font-size: 14px;
+}
+
+.paper-table >>> td.el-table__cell {
+  padding: 14px 0 !important;
+  vertical-align: top !important;
+}
+
+.paper-table >>> .cell {
+  line-height: 1.65 !important;
+  font-size: 13.5px;
+  color: var(--text-primary);
 }
 </style>
