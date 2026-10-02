@@ -1,0 +1,86 @@
+.app-back-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eef0f4;
+  box-sizing: border-box;
+}
+
+.app-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 12px 0 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #5a6675;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.18s ease, background-color 0.18s ease;
+}
+
+.app-back-button:hover,
+.app-back-button:focus {
+  background: #f2f5fa;
+  color: var(--brand);
+  outline: none;
+}
+
+.app-back-button:active {
+  background: #e8eef7;
+}
+
+.app-back-button i {
+  font-size: 15px;
+  transition: transform 0.18s ease;
+}
+
+.app-back-button:hover i {
+  transform: translateX(-2px);
+}
+
+.app-back-context {
+  min-width: 0;
+  color: #909399;
+  font-size: 13px;
+  line-height: 20px;
+  text-align: right;
+}
+
+.app-back-context strong {
+  margin-left: 6px;
+  color: #303133;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.app-back-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-back-secondary {
+  color: #606266;
+}
+
+@media (max-width: 768px) {
+  .app-back-bar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .app-back-context {
+    width: 100%;
+    text-align: left;
+  }
+}
