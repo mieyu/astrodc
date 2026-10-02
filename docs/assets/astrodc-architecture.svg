@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="640" viewBox="0 0 1040 640" role="img" aria-labelledby="title desc">
+<title id="title">astrodc 系统架构示意</title>
+<desc id="desc">浏览器访问部署在 Cloudflare Pages 的 Vue 2 前端；前端经 HTTPS 携带访问 Cookie 调用经 Cloudflare Tunnel 暴露的 Spring Boot 后端。后端分为数据库数据服务、文件服务与外部服务三组，分别连接 MySQL、服务器本地目录和 SAI MSU、STScI DSS、DeepSeek API。</desc>
+<defs>
+<marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1f4e79" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="arwg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#6b7785" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+<style>
+text{font-family:"Noto Sans CJK SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",Helvetica,Arial,sans-serif;fill:#1f2d3d}
+.h{font-size:16px;font-weight:700}
+.t{font-size:13px}
+.s{font-size:12px;fill:#5b6773}
+.m{font-family:Menlo,Consolas,"DejaVu Sans Mono",monospace;font-size:11.5px;fill:#5b6773}
+.box{fill:#ffffff;stroke:#c9d3de;stroke-width:1.4}
+.key{fill:#eef3f8;stroke:#1f4e79;stroke-width:1.6}
+.col{fill:#f7f9fb;stroke:#c9d3de;stroke-width:1.2}
+.store{fill:#ffffff;stroke:#6b7785;stroke-width:1.2;stroke-dasharray:5 4}
+.ln{stroke:#1f4e79;stroke-width:1.6;fill:none}
+.lg{stroke:#6b7785;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+</style>
+<rect x="0" y="0" width="1040" height="640" fill="#ffffff"/>
+<text x="40" y="34" class="h">astrodc 系统架构（功能/架构示意，依据源码整理，非线上截图）</text>
+
+<!-- Row A -->
+<rect x="40" y="62" width="170" height="78" rx="8" class="box"/>
+<text x="125" y="95" class="t" text-anchor="middle" font-weight="700">用户浏览器</text>
+<text x="125" y="117" class="s" text-anchor="middle">访问密钥解锁</text>
+
+<rect x="262" y="62" width="330" height="78" rx="8" class="key"/>
+<text x="427" y="88" class="t" text-anchor="middle" font-weight="700">前端 frontend/ · Vue 2 单页应用</text>
+<text x="427" y="108" class="s" text-anchor="middle">Element UI · ECharts · axios · Vue Router</text>
+<text x="427" y="127" class="m" text-anchor="middle">Cloudflare Pages · astrodc.top</text>
+
+<rect x="644" y="62" width="356" height="78" rx="8" class="key"/>
+<text x="822" y="88" class="t" text-anchor="middle" font-weight="700">后端 backend/ · Spring Boot 3.5（Java 17）</text>
+<text x="822" y="108" class="s" text-anchor="middle">访问密钥拦截器 + 签名 Cookie · 端口 8088</text>
+<text x="822" y="127" class="m" text-anchor="middle">Cloudflare Tunnel · api.astrodc.top</text>
+
+<path d="M210 101 H256" class="ln" marker-end="url(#arw)"/>
+<path d="M592 101 H638" class="ln" marker-end="url(#arw)"/>
+<text x="615" y="93" class="s" text-anchor="middle">HTTPS</text>
+
+<!-- bus -->
+<path d="M822 140 V166 H185 V188" class="ln" marker-end="url(#arw)"/>
+<path d="M520 166 V188" class="ln" marker-end="url(#arw)"/>
+<path d="M855 166 V188" class="ln" marker-end="url(#arw)"/>
+
+<!-- Columns -->
+<rect x="40" y="194" width="290" height="236" rx="8" class="col"/>
+<text x="60" y="222" class="t" font-weight="700">① 数据检索服务</text>
+<text x="60" y="250" class="t">自有图像元数据检索、统计与下载</text>
+<text x="60" y="268" class="m">/api/image/own/*</text>
+<text x="60" y="296" class="t">规范化定位结果（观测星表）</text>
+<text x="60" y="314" class="m">/api/positioning/normalized/*</text>
+<text x="60" y="342" class="t">星表偏差修正表（17 个历史星表）</text>
+<text x="60" y="360" class="m">/api/catalog-bias-correction/*</text>
+<text x="60" y="388" class="t">论文列表</text>
+<text x="60" y="406" class="m">/api/site/paper/*</text>
+
+<rect x="375" y="194" width="290" height="236" rx="8" class="col"/>
+<text x="395" y="222" class="t" font-weight="700">② 文件与 FITS 服务</text>
+<text x="395" y="250" class="t">观测文件浏览、下载与 PNG 预览</text>
+<text x="395" y="268" class="m">/files/* · /fits/image</text>
+<text x="395" y="296" class="t">FITS 头文件解析（上传文件）</text>
+<text x="395" y="314" class="m">/fits/parse</text>
+<text x="395" y="342" class="t">曝光时间计算（上传 FITS）</text>
+<text x="395" y="360" class="m">/api/exposure/analyze</text>
+<text x="395" y="388" class="t">历史观测报告只读预览与下载</text>
+<text x="395" y="406" class="m">/api/observation-reports/*</text>
+
+<rect x="710" y="194" width="290" height="236" rx="8" class="col"/>
+<text x="730" y="222" class="t" font-weight="700">③ 计算与外部服务</text>
+<text x="730" y="250" class="t">天然卫星星历计算</text>
+<text x="730" y="268" class="m">/api/ephemeris/calculate</text>
+<text x="730" y="296" class="t">DSS 寻星图预览与保存</text>
+<text x="730" y="314" class="m">/api/ephemeris/download_chart</text>
+<text x="730" y="342" class="t">学术 AI 助手：生成只读 SQL 并总结</text>
+<text x="730" y="360" class="m">/analyze</text>
+<text x="730" y="388" class="t">曝光结果 AI 解读</text>
+<text x="730" y="406" class="m">/api/exposure/ai-analyze</text>
+
+<!-- stores -->
+<path d="M185 430 V478" class="lg" marker-end="url(#arwg)"/>
+<path d="M520 430 V478" class="lg" marker-end="url(#arwg)"/>
+<path d="M855 430 V478" class="lg" marker-end="url(#arwg)"/>
+<path d="M710 360 H676 V470 H260 V478" class="lg" marker-end="url(#arwg)"/>
+
+<rect x="40" y="484" width="290" height="80" rx="8" class="store"/>
+<text x="185" y="514" class="t" text-anchor="middle" font-weight="700">MySQL · MyBatis-Plus</text>
+<text x="185" y="536" class="m" text-anchor="middle">satellite_data_center</text>
+<text x="185" y="554" class="s" text-anchor="middle">image_own · positioning_normalized 等</text>
+
+<rect x="375" y="484" width="290" height="80" rx="8" class="store"/>
+<text x="520" y="514" class="t" text-anchor="middle" font-weight="700">服务器本地目录</text>
+<text x="520" y="536" class="m" text-anchor="middle">ASTRONOMY_FILE_ROOT</text>
+<text x="520" y="554" class="m" text-anchor="middle">ASTRONOMY_REPORT_ROOT</text>
+
+<rect x="710" y="484" width="290" height="80" rx="8" class="store"/>
+<text x="855" y="514" class="t" text-anchor="middle" font-weight="700">外部接口</text>
+<text x="855" y="536" class="s" text-anchor="middle">SAI MSU NSS 历表 · STScI DSS 图像</text>
+<text x="855" y="554" class="s" text-anchor="middle">DeepSeek Chat API</text>
+
+<text x="40" y="600" class="s">实线：请求链路；虚线：数据来源。AI 助手查询 MySQL 中的分析表（ASTRONOMY_ANALYSIS_TABLE），仅允许 SELECT / SHOW 语句。</text>
+<text x="40" y="620" class="s">除访问解锁与健康检查外，后端接口均需有效访问 Cookie；观测报告接口为只读，网页不提供上传或删除报告。</text>
+</svg>
