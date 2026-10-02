@@ -186,7 +186,7 @@ public class ImageOwnServiceImpl extends ServiceImpl<ImageOwnMapper, ImageOwn> i
 
     @Override
     public boolean updateImageOwn(ImageOwn imageOwn) {
-        return this.updateById(imageOwn);
+        return false;
     }
 
     @Override

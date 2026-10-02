@@ -16,7 +16,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/files")
 public class FileController {
 

@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/api/positioning/normalized")
 public class PositioningNormalizedController {
 

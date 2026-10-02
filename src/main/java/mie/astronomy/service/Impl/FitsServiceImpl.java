@@ -6,18 +6,28 @@ import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 import nom.tam.fits.ImageHDU;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
 @Service
 public class FitsServiceImpl implements FitsService {
+
+    private static final Logger log = LoggerFactory.getLogger(FitsServiceImpl.class);
+    private static final int MAX_PREVIEW_SIZE = 1600;
+    private static final int MAX_PERCENTILE_SAMPLES = 100_000;
+    private static final double ASINH_STRENGTH = 8.0;
 
     @Autowired
     private FileService fileService;
@@ -25,164 +35,183 @@ public class FitsServiceImpl implements FitsService {
     @Override
     public byte[] fitsToPng(String filePath) throws IOException {
         Path absolutePath = fileService.resolvePath(filePath);
-        Fits f = null;
+        if (!Files.isRegularFile(absolutePath) || !Files.isReadable(absolutePath)) {
+            throw new IOException("FITS 文件不存在或无法读取: " + filePath);
+        }
+
+        Fits fits = null;
         try {
-            f = new Fits(absolutePath.toFile());
-
-            ImageHDU hdu = null;
-            BasicHDU<?> basicHdu;
-            int hduIndex = 0;
-            while ((basicHdu = f.readHDU()) != null) {
-                if (basicHdu instanceof ImageHDU) {
-                    if (basicHdu.getKernel() != null && ((ImageHDU) basicHdu).getAxes().length > 0) {
-                        hdu = (ImageHDU) basicHdu;
-                        System.out.println("Success: Found valid image data in HDU at index " + hduIndex);
-                        break; // Found it, exit the loop
-                    }
-                }
-                hduIndex++;
-            }
-
-            if (hdu == null) {
-                throw new IOException("FITS file does not contain a valid ImageHDU with data.");
-            }
+            fits = new Fits(absolutePath.toFile());
+            ImageHDU hdu = findFirstImageHdu(fits);
 
             int[] axes = hdu.getAxes();
-            int height = axes[0];
-            int width = axes.length > 1 ? axes[1] : 1;
-            if (axes.length > 2) {
-                width = axes[1];
-                height = axes[2];
+            if (axes == null || axes.length < 2) {
+                throw new IOException("FITS 文件不包含二维图像数据");
             }
-
-            BufferedImage bimg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            int sourceHeight = axes[axes.length - 2];
+            int sourceWidth = axes[axes.length - 1];
+            int[] dimensions = calculatePreviewDimensions(sourceWidth, sourceHeight, MAX_PREVIEW_SIZE);
+            int previewWidth = dimensions[0];
+            int previewHeight = dimensions[1];
 
             Header header = hdu.getHeader();
-            int bitpix = header.getIntValue("BITPIX");
-            Object dataKernel = hdu.getKernel();
-
-            int totalPixels = 1;
-            for(int axisSize : axes) totalPixels *= axisSize;
-            double[] flatData = flattenData(dataKernel, bitpix, totalPixels);
-
-            int frameSize = width * height;
-            double[] previewData = new double[frameSize];
-            System.arraycopy(flatData, 0, previewData, 0, frameSize);
-
-
-            double[] sortedData = Arrays.copyOf(previewData, previewData.length);
-            Arrays.sort(sortedData);
-
-            int lowerCutIndex = (int) (sortedData.length * 0.01f);
-            int upperCutIndex = (int) (sortedData.length * 0.99f) - 1;
-            if (upperCutIndex < 0) upperCutIndex = 0;
-            if (lowerCutIndex >= sortedData.length) lowerCutIndex = sortedData.length - 1;
-
-            double min = sortedData[lowerCutIndex];
-            double max = sortedData[upperCutIndex];
-            double range = (max - min) == 0 ? 1.0 : (max - min);
-
-            for (int i = 0; i < previewData.length; i++) {
-                double value = previewData[i];
-                if (value < min) value = min;
-                if (value > max) value = max;
-                int gray = (int) (255.0 * (value - min) / range);
-                int rgb = (gray << 16) | (gray << 8) | gray;
-                int x = i % width;
-                int y = i / width;
-                bimg.setRGB(x, y, rgb);
-            }
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(bimg, "png", baos);
-            baos.flush();
-            byte[] imageInByte = baos.toByteArray();
-            baos.close();
-            return imageInByte;
-
+            double bzero = header.getDoubleValue("BZERO", 0.0);
+            double bscale = header.getDoubleValue("BSCALE", 1.0);
+            Object imagePlane = selectFirstImagePlane(hdu.getKernel(), axes.length);
+            double[] previewData = downsample(
+                imagePlane, sourceWidth, sourceHeight, previewWidth, previewHeight, bzero, bscale);
+            double[] cuts = calculatePercentileCuts(previewData);
+            byte[] png = renderPng(previewData, previewWidth, previewHeight, cuts[0], cuts[1]);
+            log.info("Generated FITS preview {}x{} from {}x{}: {}",
+                previewWidth, previewHeight, sourceWidth, sourceHeight, absolutePath.getFileName());
+            return png;
+        } catch (IOException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new IOException("Failed to process FITS file: " + e.getClass().getName() + " - " + e.getMessage(), e);
+            throw new IOException("FITS 预览生成失败: " + e.getMessage(), e);
         } finally {
-            if (f != null) {
+            if (fits != null) {
                 try {
-                    f.close();
-                } catch (IOException e) {
-                    // ignore
+                    fits.close();
+                } catch (IOException closeError) {
+                    log.debug("Failed to close FITS file {}", absolutePath, closeError);
                 }
             }
         }
     }
 
-    // flattenData function remains unchanged
-    private double[] flattenData(Object kernelData, int bitpix, int totalPixels) {
-        double[] flat = new double[totalPixels];
-        int index = 0;
-
-        switch (bitpix) {
-            case 16: // short
-                if (kernelData instanceof short[][][]) {
-                    for (short[][] plane : (short[][][]) kernelData) {
-                        for (short[] row : plane) {
-                            for (short val : row) flat[index++] = val;
-                        }
-                    }
-                } else if (kernelData instanceof short[][]) {
-                    for (short[] row : (short[][]) kernelData) {
-                        for (short val : row) flat[index++] = val;
-                    }
-                } else {
-                    for (short val : (short[]) kernelData) flat[index++] = val;
-                }
-                break;
-            case 32: // int
-                if (kernelData instanceof int[][][]) {
-                    for (int[][] plane : (int[][][]) kernelData) {
-                        for (int[] row : plane) {
-                            for (int val : row) flat[index++] = val;
-                        }
-                    }
-                } else if (kernelData instanceof int[][]) {
-                    for (int[] row : (int[][]) kernelData) {
-                        for (int val : row) flat[index++] = val;
-                    }
-                } else {
-                    for (int val : (int[]) kernelData) flat[index++] = val;
-                }
-                break;
-            case -32: // float
-                if (kernelData instanceof float[][][]) {
-                    for (float[][] plane : (float[][][]) kernelData) {
-                        for (float[] row : plane) {
-                            for (float val : row) flat[index++] = val;
-                        }
-                    }
-                } else if (kernelData instanceof float[][]) {
-                    for (float[] row : (float[][]) kernelData) {
-                        for (float val : row) flat[index++] = val;
-                    }
-                } else {
-                    for (float val : (float[]) kernelData) flat[index++] = val;
-                }
-                break;
-            case -64: // double
-                if (kernelData instanceof double[][][]) {
-                    for (double[][] plane : (double[][][]) kernelData) {
-                        for (double[] row : plane) {
-                            for (double val : row) flat[index++] = val;
-                        }
-                    }
-                } else if (kernelData instanceof double[][]) {
-                    for (double[] row : (double[][]) kernelData) {
-                        for (double val : row) flat[index++] = val;
-                    }
-                } else {
-                    for (double val : (double[]) kernelData) flat[index++] = val;
-                }
-                break;
-            default:
-                throw new UnsupportedOperationException("Unsupported BITPIX type: " + bitpix);
+    private ImageHDU findFirstImageHdu(Fits fits) throws Exception {
+        BasicHDU<?> basicHdu;
+        while ((basicHdu = fits.readHDU()) != null) {
+            if (basicHdu instanceof ImageHDU imageHdu
+                    && imageHdu.getKernel() != null
+                    && imageHdu.getAxes() != null
+                    && imageHdu.getAxes().length >= 2) {
+                return imageHdu;
+            }
         }
-        return flat;
+        throw new IOException("FITS 文件中没有找到有效图像数据");
     }
+
+    private Object selectFirstImagePlane(Object kernel, int dimensions) throws IOException {
+        Object plane = kernel;
+        for (int i = 0; i < dimensions - 2; i++) {
+            if (plane == null || !plane.getClass().isArray() || Array.getLength(plane) == 0) {
+                throw new IOException("FITS 数据立方体不包含可预览图层");
+            }
+            plane = Array.get(plane, 0);
+        }
+        return plane;
+    }
+
+    private double[] downsample(
+            Object plane,
+            int sourceWidth,
+            int sourceHeight,
+            int previewWidth,
+            int previewHeight,
+            double bzero,
+            double bscale) throws IOException {
+        if (plane == null || !plane.getClass().isArray() || Array.getLength(plane) < sourceHeight) {
+            throw new IOException("FITS 图像数据与头部尺寸不一致");
+        }
+
+        double[] pixels = new double[Math.multiplyExact(previewWidth, previewHeight)];
+        int targetIndex = 0;
+        for (int y = 0; y < previewHeight; y++) {
+            int sourceY = Math.min(sourceHeight - 1,
+                (int) (((long) y * sourceHeight + sourceHeight / 2L) / previewHeight));
+            Object row = Array.get(plane, sourceY);
+            if (row == null || !row.getClass().isArray() || Array.getLength(row) < sourceWidth) {
+                throw new IOException("FITS 图像行数据与头部尺寸不一致");
+            }
+            for (int x = 0; x < previewWidth; x++) {
+                int sourceX = Math.min(sourceWidth - 1,
+                    (int) (((long) x * sourceWidth + sourceWidth / 2L) / previewWidth));
+                pixels[targetIndex++] = bzero + bscale * readPixel(row, sourceX);
+            }
+        }
+        return pixels;
+    }
+
+    private double readPixel(Object row, int x) throws IOException {
+        if (row instanceof byte[] values) return values[x] & 0xFF;
+        if (row instanceof short[] values) return values[x];
+        if (row instanceof int[] values) return values[x];
+        if (row instanceof long[] values) return values[x];
+        if (row instanceof float[] values) return values[x];
+        if (row instanceof double[] values) return values[x];
+        throw new IOException("不支持的 FITS 像素类型: " + row.getClass().getTypeName());
+    }
+
+    static int[] calculatePreviewDimensions(int width, int height, int maxSize) {
+        if (width <= 0 || height <= 0 || maxSize <= 0) {
+            throw new IllegalArgumentException("图像尺寸必须大于 0");
+        }
+        int longestSide = Math.max(width, height);
+        if (longestSide <= maxSize) {
+            return new int[]{width, height};
+        }
+        double scale = (double) maxSize / longestSide;
+        return new int[]{
+            Math.max(1, (int) Math.round(width * scale)),
+            Math.max(1, (int) Math.round(height * scale))
+        };
+    }
+
+    static double[] calculatePercentileCuts(double[] pixels) throws IOException {
+        int stride = Math.max(1, (int) Math.ceil((double) pixels.length / MAX_PERCENTILE_SAMPLES));
+        double[] samples = new double[Math.min(pixels.length, MAX_PERCENTILE_SAMPLES)];
+        int sampleCount = 0;
+        for (int i = 0; i < pixels.length && sampleCount < samples.length; i += stride) {
+            if (Double.isFinite(pixels[i])) {
+                samples[sampleCount++] = pixels[i];
+            }
+        }
+        if (sampleCount == 0) {
+            throw new IOException("FITS 图像不包含有效像素");
+        }
+
+        Arrays.sort(samples, 0, sampleCount);
+        int lowerIndex = (int) Math.floor((sampleCount - 1) * 0.01);
+        int upperIndex = (int) Math.ceil((sampleCount - 1) * 0.99);
+        double lower = samples[lowerIndex];
+        double upper = samples[upperIndex];
+        if (!(upper > lower)) {
+            upper = lower + 1.0;
+        }
+        return new double[]{lower, upper};
+    }
+
+    private byte[] renderPng(
+            double[] pixels, int width, int height, double lowerCut, double upperCut) throws IOException {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+        byte[] raster = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+        double range = upperCut - lowerCut;
+        double stretchDenominator = asinh(ASINH_STRENGTH);
+
+        for (int i = 0; i < pixels.length; i++) {
+            double normalized = (pixels[i] - lowerCut) / range;
+            if (!Double.isFinite(normalized) || normalized <= 0) {
+                raster[i] = 0;
+            } else if (normalized >= 1) {
+                raster[i] = (byte) 255;
+            } else {
+                double stretched = asinh(normalized * ASINH_STRENGTH) / stretchDenominator;
+                raster[i] = (byte) Math.round(stretched * 255.0);
+            }
+        }
+
+        try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            if (!ImageIO.write(image, "png", output)) {
+                throw new IOException("当前运行环境不支持 PNG 编码");
+            }
+            return output.toByteArray();
+        }
+    }
+
+    private static double asinh(double value) {
+        return Math.log(value + Math.sqrt(value * value + 1.0));
+    }
+
 }

@@ -22,7 +22,6 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/api/ephemeris")
 public class EphemerisController {
 

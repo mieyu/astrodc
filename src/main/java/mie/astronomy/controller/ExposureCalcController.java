@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
  * FITS 图像分析与物理噪声模型计算全部在后端完成。
  */
 @RestController
-@CrossOrigin
 @RequestMapping("/api/exposure")
 public class ExposureCalcController {
 

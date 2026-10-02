@@ -30,6 +30,9 @@ public class DeepSeekServiceImpl implements DeepSeekService {
     @Value("${deepseek.model}")
     private String model;
 
+    @Value("${deepseek.analysis-table:observation_image.total}")
+    private String analysisTable;
+
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
@@ -68,8 +71,16 @@ public class DeepSeekServiceImpl implements DeepSeekService {
      */
     private String getTableSchema() {
         try {
-            String sql = "SHOW FULL COLUMNS FROM total";
-            List<Map<String, Object>> columns = jdbcTemplate.queryForList(sql);
+            String[] tableParts = splitQualifiedTable(analysisTable);
+            String sql = "SELECT COLUMN_NAME AS Field, COLUMN_TYPE AS Type, COLUMN_COMMENT AS Comment " +
+                "FROM information_schema.COLUMNS " +
+                "WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? " +
+                "ORDER BY ORDINAL_POSITION";
+            List<Map<String, Object>> columns = jdbcTemplate.queryForList(
+                sql, tableParts[0], tableParts[1]);
+            if (columns.isEmpty()) {
+                throw new IllegalStateException("未找到分析表: " + analysisTable);
+            }
             
             StringBuilder schema = new StringBuilder();
             for (Map<String, Object> column : columns) {
@@ -80,8 +91,7 @@ public class DeepSeekServiceImpl implements DeepSeekService {
             }
             return schema.toString();
         } catch (Exception e) {
-            e.printStackTrace();
-            return "";
+            throw new IllegalStateException("读取分析表结构失败: " + e.getMessage(), e);
         }
     }
 
@@ -165,13 +175,16 @@ public class DeepSeekServiceImpl implements DeepSeekService {
      */
     private String generateSql(String task) {
         String schema = getTableSchema();
+        String qualifiedTable = quoteQualifiedTable(analysisTable);
+        String objectCodeGuidance = AstronomyObjectCodeResolver.buildPromptGuidance(task);
         String basePrompt = String.format(
             "你是SQL生成器。严格遵守：\n" +
             "1) 只输出可执行MySQL语句；不得含说明或markdown；\n" +
-            "2) 只使用表名 total。\n" +
+            "2) 只使用表 %s，并始终使用这个完整表名。\n" +
+            "3) %s\n" +
             "任务：%s\n" +
             "表结构：\n%s\n",
-            task, schema
+            qualifiedTable, objectCodeGuidance, task, schema
         );
 
         String sql = callDeepSeek(basePrompt, 0.0);
@@ -181,7 +194,43 @@ public class DeepSeekServiceImpl implements DeepSeekService {
         if (!sql.trim().endsWith(";")) {
             sql += ";";
         }
-        return sql;
+        sql = qualifyAnalysisTableReferences(sql, analysisTable);
+        return AstronomyObjectCodeResolver.applyResolvedObjectFilter(sql, task);
+    }
+
+    static String[] splitQualifiedTable(String qualifiedTable) {
+        if (qualifiedTable == null || !qualifiedTable.matches("^[A-Za-z0-9_]+\\.[A-Za-z0-9_]+$")) {
+            throw new IllegalStateException("deepseek.analysis-table 必须使用 database.table 格式");
+        }
+        return qualifiedTable.split("\\.", 2);
+    }
+
+    static String quoteQualifiedTable(String qualifiedTable) {
+        String[] parts = splitQualifiedTable(qualifiedTable);
+        return "`" + parts[0] + "`.`" + parts[1] + "`";
+    }
+
+    /**
+     * 兼容模型偶尔忽略提示、仍返回 FROM total/JOIN total 的情况。
+     */
+    static String qualifyAnalysisTableReferences(String sql, String qualifiedTable) {
+        if (sql == null || sql.isBlank()) {
+            return sql;
+        }
+
+        String[] parts = splitQualifiedTable(qualifiedTable);
+        Pattern unqualifiedReference = Pattern.compile(
+            "(?i)\\b(FROM|JOIN)\\s+(?:`?[A-Za-z0-9_]+`?\\.)?`?" +
+                Pattern.quote(parts[1]) + "`?(?=\\s|;|$)");
+        Matcher matcher = unqualifiedReference.matcher(sql);
+        StringBuffer result = new StringBuffer();
+        String quotedTable = quoteQualifiedTable(qualifiedTable);
+        while (matcher.find()) {
+            matcher.appendReplacement(
+                result, Matcher.quoteReplacement(matcher.group(1) + " " + quotedTable));
+        }
+        matcher.appendTail(result);
+        return result.toString();
     }
 
     /**
@@ -280,4 +329,3 @@ public class DeepSeekServiceImpl implements DeepSeekService {
         }
     }
 }
-

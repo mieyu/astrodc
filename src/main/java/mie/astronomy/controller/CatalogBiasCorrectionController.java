@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/api/catalog-bias-correction")
 public class CatalogBiasCorrectionController {
 

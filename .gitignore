@@ -34,3 +34,6 @@ build/
 
 ### VS Code ###
 .vscode/
+.startup-spring-boot.*.log
+.wrangler/
+/config/application-private.yml

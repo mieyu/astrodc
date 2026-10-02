@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:file:./config/application-private.yml
   servlet:
     http:
       encoding:
@@ -13,7 +15,7 @@ spring:
     url: jdbc:mysql://localhost:3306/satellite_data_center?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowPublicKeyRetrieval=true
     # 新增 allowPublicKeyRetrieval=true，允许驱动检索MySQL公钥，解决连接错误
     username: root
-    password: 123456
+    password: ${ASTRONOMY_DB_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver # MySQL 8.0+ 必须使用此驱动类（旧版com.mysql.jdbc.Driver已废弃）
 
 mybatis-plus:
@@ -31,12 +33,13 @@ server:
   port: 8088 # 项目启动端口
 
 file:
-  root-path: ${ASTRONOMY_FILE_ROOT:./Observated_images} # 文件存储根路径，可通过环境变量覆盖
+  root-path: ${ASTRONOMY_FILE_ROOT:E:/Observated_images} # 文件存储根路径，可通过环境变量覆盖
 
 deepseek:
-  api-key: sk-5c80920be9644e87adef23788933bdd6
+  api-key: ${DEEPSEEK_API_KEY:}
   api-url: https://api.deepseek.com/v1/chat/completions
   model: deepseek-chat
+  analysis-table: ${ASTRONOMY_ANALYSIS_TABLE:observation_image.total}
 
 ephemeris:
   msu-url: https://www.sai.msu.ru/neb/nss/cgi-bin/nss-eph3.cgi
@@ -49,3 +52,15 @@ ephemeris:
     enabled: false
     host: ""
     port: 0
+
+access:
+  key: ${ASTRONOMY_ACCESS_KEY:}
+  cookie-name: ASTRONOMY_ACCESS
+  cookie-max-age-seconds: 604800
+  cookie-secure: true
+  cookie-same-site: Lax
+  allowed-origins:
+    - https://astrodc.top
+    - https://astrodc.pages.dev
+    - http://localhost:8080
+    - http://localhost:8081

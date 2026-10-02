@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/api/image/own")
 public class ImageOwnController {
     @Autowired
@@ -89,12 +88,7 @@ public class ImageOwnController {
 
     @PutMapping("/update")
     public Result<?> update(@RequestBody ImageOwn imageOwn) {
-        boolean success = imageOwnService.updateImageOwn(imageOwn);
-        if (success) {
-            return Result.success("更新成功");
-        } else {
-            return Result.error("更新失败，未找到对应记录或数据无变化");
-        }
+        return Result.error("自有图像数据修改功能已临时关闭");
     }
 
     @GetMapping("/stats")
