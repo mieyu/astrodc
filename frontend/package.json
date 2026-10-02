@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "deploy": "node ../scripts/deploy-frontend.cjs",
+    "deploy": "node scripts/deploy.cjs",
     "test:api-config": "node scripts/verify-api-config.js",
     "test:access-gate": "node scripts/verify-access-gate.js",
     "test:deploy-script": "node scripts/verify-deploy-script.js",

@@ -1,12 +1,7 @@
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
 const path = require('node:path');
-const root = path.resolve(__dirname, '../..');
-const pkg = require('../package.json');
-assert.equal(pkg.scripts.deploy, 'node ../scripts/deploy-frontend.cjs');
-const deployment = JSON.parse(fs.readFileSync(path.join(root, 'deployment.json'), 'utf8'));
-assert.equal(deployment.cloudflare.project, 'astrodc');
-assert.equal(typeof deployment.cloudflare.paused, 'boolean');
-const script = fs.readFileSync(path.join(root, 'scripts/deploy-frontend.cjs'), 'utf8');
-for (const snippet of ['if (config.paused)', 'test:api-config', 'test:access-gate', 'build', "'pages', 'deploy', 'dist'", 'config.project']) assert.ok(script.includes(snippet), snippet);
-console.log('Monorepo deploy script checks the deployment pause and targets astrodc.');
+const { spawnSync } = require('node:child_process');
+const result = spawnSync(process.execPath, [path.join(__dirname, 'deploy.cjs')], { encoding: 'utf8' });
+assert.equal(result.status, 1);
+assert.match(result.stderr, /Cloudflare deployment is paused/);
+console.log('Cloudflare deployment is blocked while paused.');

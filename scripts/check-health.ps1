@@ -36,6 +36,4 @@ if ($listener) {
 }
 if ($owned) { Write-Output ("PASS Backend runs from " + $backendDir) }
 else { $failed = $true; Write-Output 'FAIL Backend process does not use this astrodc checkout.' }
-$deployment = Get-Content -LiteralPath (Join-Path $rootDir 'deployment.json') -Raw | ConvertFrom-Json
-Write-Output ('Cloudflare deployment paused: ' + $deployment.cloudflare.paused)
 if ($failed) { exit 1 }
