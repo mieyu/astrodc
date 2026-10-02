@@ -1,0 +1,6 @@
+{
+  "cloudflare": {
+    "project": "astrodc",
+    "paused": true
+  }
+}

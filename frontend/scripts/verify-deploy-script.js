@@ -1,31 +1,12 @@
-const fs = require('fs');
-const path = require('path');
-
-const root = path.resolve(__dirname, '..');
-const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
-const deploy = pkg.scripts && pkg.scripts.deploy;
-const failures = [];
-
-if (!deploy) {
-  failures.push('package.json is missing scripts.deploy');
-} else {
-  const required = [
-    'npm run test:api-config',
-    'npm run test:access-gate',
-    'npm run build',
-    'npx wrangler pages deploy dist --project-name astrodc --branch main --commit-dirty=true',
-  ];
-
-  for (const command of required) {
-    if (!deploy.includes(command)) {
-      failures.push(`scripts.deploy is missing: ${command}`);
-    }
-  }
-}
-
-if (failures.length) {
-  console.error(failures.join('\n'));
-  process.exit(1);
-}
-
-console.log('Deploy script is configured.');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const root = path.resolve(__dirname, '../..');
+const pkg = require('../package.json');
+assert.equal(pkg.scripts.deploy, 'node ../scripts/deploy-frontend.cjs');
+const deployment = JSON.parse(fs.readFileSync(path.join(root, 'deployment.json'), 'utf8'));
+assert.equal(deployment.cloudflare.project, 'astrodc');
+assert.equal(typeof deployment.cloudflare.paused, 'boolean');
+const script = fs.readFileSync(path.join(root, 'scripts/deploy-frontend.cjs'), 'utf8');
+for (const snippet of ['if (config.paused)', 'test:api-config', 'test:access-gate', 'build', "'pages', 'deploy', 'dist'", 'config.project']) assert.ok(script.includes(snippet), snippet);
+console.log('Monorepo deploy script checks the deployment pause and targets astrodc.');

@@ -1,0 +1,8 @@
+.runtime/
+.migration/
+.wrangler/
+.idea/
+.vscode/
+.DS_Store
+*.log
+node_modules/
