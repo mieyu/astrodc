@@ -1,6 +1,6 @@
 # astrodc — 天然卫星数据中心
 
-前端与 Java 后端统一维护在本仓库。两边原有 Git 提交历史均已保留。
+本项目包含 Vue 前端与 Java 后端，后端集成 AI Agent。
 
 ```text
 astrodc/
@@ -42,4 +42,3 @@ Windows 自动恢复任务应指向总目录的 `scripts/start-backend.ps1`，�
 后端自动恢复计划任务、Cloudflare Tunnel 开机入口及 PowerShell 的 `on/off` 命令均使用本仓库 `scripts/` 中的脚本。
 执行 `npm run check:health` 可检查本机后端、线上前端、Cloudflare Tunnel 与 API，并确认后端运行目录属于本仓库。
 执行 `npm run tunnel` 可启动已有隧道；凭据和配置仍保存在用户的 `.cloudflared` 目录，不提交到 Git。
-旧 GitHub 前后端仓库保留历史，本机统一只维护 astrodc。Cloudflare 新部署继续暂停。

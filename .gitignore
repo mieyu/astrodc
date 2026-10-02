@@ -1,5 +1,4 @@
 .runtime/
-.migration/
 .wrangler/
 .idea/
 .vscode/
