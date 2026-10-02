@@ -35,24 +35,36 @@
           <div class="form-group">
             <label class="field-label">目标天体 (Object)</label>
             <div class="satellite-box">
-              <div class="satellite-radios">
-                <label
-                  v-for="sat in satellites"
-                  :key="sat.code"
-                  class="sat-pill"
-                  :class="{ active: selectedSat === sat.code && !customSatellite }">
-                  <input
-                    type="radio"
+              <el-select
+                v-model="selectedSat"
+                filterable
+                class="target-select"
+                popper-class="ephemeris-target-options"
+                placeholder="搜索天体名称或编号"
+                aria-label="目标天体"
+                size="small"
+                @change="onSatelliteChange">
+                <el-option-group
+                  v-for="group in satelliteGroups"
+                  :key="group.id"
+                  :label="`${group.name} (${group.targets.length})`">
+                  <el-option
+                    v-for="sat in group.targets"
+                    :key="sat.code"
                     :value="sat.code"
-                    v-model="selectedSat"
-                    @change="onRadioChange">
-                  <span>{{ sat.name.split(' ')[0] }}</span>
-                </label>
-              </div>
+                    :label="`${sat.name} · ${sat.label} (${sat.code})`">
+                    <span class="target-option-name">{{ sat.name }} ({{ sat.code }})</span>
+                    <span class="target-option-detail">{{ sat.label }} · {{ sat.type }}</span>
+                  </el-option>
+                </el-option-group>
+              </el-select>
+              <p v-if="selectedTarget && !customSatellite" class="selected-target">
+                {{ selectedTarget.name }} · {{ selectedTarget.label }} · {{ selectedTarget.type }}
+              </p>
               <div class="satellite-divider"></div>
               <el-input
                 v-model="customSatellite"
-                placeholder="或输入自定义代码 (如 301 表示月球)"
+                placeholder="或输入 MSU 接口编号"
                 size="small"
                 @input="onCustomChange">
               </el-input>
@@ -161,14 +173,23 @@
         <el-card v-if="previewVisible" class="preview-card" shadow="hover">
           <div slot="header" class="card-title preview-header">
             <span><i class="el-icon-picture-outline"></i> 图像预览</span>
-            <el-button
-              v-if="previewUrl"
-              type="success"
-              size="mini"
-              icon="el-icon-download"
-              @click="downloadCurrentPreview">
-              保存图片
-            </el-button>
+            <div class="preview-actions">
+              <el-checkbox
+                v-if="previewUrl"
+                v-model="showCenterCrosshair"
+                title="在图像中心显示或隐藏目标十字准星">
+                中心十字准星
+              </el-checkbox>
+              <el-button
+                v-if="previewUrl"
+                type="success"
+                size="mini"
+                icon="el-icon-download"
+                :loading="savingPreview"
+                @click="downloadCurrentPreview">
+                保存图片
+              </el-button>
+            </div>
           </div>
           <div class="preview-content">
             <div v-if="previewLoading" class="preview-loading">
@@ -180,7 +201,13 @@
               <p>{{ previewError }}</p>
             </div>
             <div v-else-if="previewUrl" class="preview-image-wrap">
-              <img :src="previewImageSrc" alt="DSS Chart" @click="openFullscreen">
+              <img ref="previewImage" :src="previewImageSrc" alt="DSS Chart" @click="openFullscreen">
+              <div v-if="showCenterCrosshair" class="center-crosshair" aria-hidden="true">
+                <span class="crosshair-arm crosshair-top"></span>
+                <span class="crosshair-arm crosshair-right"></span>
+                <span class="crosshair-arm crosshair-bottom"></span>
+                <span class="crosshair-arm crosshair-left"></span>
+              </div>
               <div class="fov-badge">FOV: {{ fov }}'</div>
             </div>
           </div>
@@ -196,27 +223,33 @@
       top="3vh"
       custom-class="fullscreen-dialog"
       append-to-body>
-      <img v-if="previewImageSrc" :src="previewImageSrc" alt="DSS Chart Fullscreen" class="fullscreen-img">
+      <div slot="title" class="fullscreen-title">
+        <span>图像预览</span>
+        <el-checkbox
+          v-if="previewImageSrc"
+          v-model="showCenterCrosshair"
+          title="在图像中心显示或隐藏目标十字准星">
+          中心十字准星
+        </el-checkbox>
+      </div>
+      <div v-if="previewImageSrc" class="fullscreen-image-wrap">
+        <img :src="previewImageSrc" alt="DSS Chart Fullscreen" class="fullscreen-img">
+        <div v-if="showCenterCrosshair" class="center-crosshair" aria-hidden="true">
+          <span class="crosshair-arm crosshair-top"></span>
+          <span class="crosshair-arm crosshair-right"></span>
+          <span class="crosshair-arm crosshair-bottom"></span>
+          <span class="crosshair-arm crosshair-left"></span>
+        </div>
+      </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import SATELLITE_GROUPS from '../data/ephemeris-targets.json';
 
-const SATELLITES = [
-  { name: 'S0 (6000)', code: '6000' },
-  { name: 'S8 (6008)', code: '6008' },
-  { name: 'S9 (6009)', code: '6009' },
-  { name: 'J0 (5000)', code: '5000' },
-  { name: 'J6 (10001)', code: '10001' },
-  { name: 'J7 (10002)', code: '10002' },
-  { name: 'J8 (10003)', code: '10003' },
-  { name: 'J9 (10004)', code: '10004' },
-  { name: 'N1 (8001)', code: '8001' },
-  { name: 'N2 (8002)', code: '8002' },
-  { name: 'U0 (7000)', code: '7000' }
-];
+const SATELLITES = SATELLITE_GROUPS.flatMap(group => group.targets);
 
 const NDE_OPTIONS = [
   { value: '6', label: 'DE441 (默认)' },
@@ -247,11 +280,23 @@ function formatUtcSpace(date) {
   ].join(' ');
 }
 
+// The upstream sign may appear on minutes/seconds when degrees are zero.
+// Move it to degrees using strings to preserve -0, leading zeros and precision.
+function normalizeDeclination(value) {
+  if (typeof value !== 'string') return value;
+  const parts = value.match(/^(\s*)([+-]?\d+(?:\.\d+)?)(\s*°\s*|\s+)([+-]?\d+(?:\.\d+)?)(\s*['′]\s*|\s+)([+-]?\d+(?:\.\d+)?)(\s*["″]?\s*)$/);
+  if (!parts || ![parts[2], parts[4], parts[6]].some(part => part.startsWith('-'))) return value;
+  const magnitude = part => part.replace(/^[+-]/, '');
+  return parts[1] + '-' + magnitude(parts[2]) + parts[3]
+    + magnitude(parts[4]) + parts[5] + magnitude(parts[6]) + parts[7];
+}
+
 export default {
   name: 'EphemerisTool',
   data() {
     return {
       satellites: SATELLITES,
+      satelliteGroups: SATELLITE_GROUPS,
       ndeOptions: NDE_OPTIONS,
 
       observatory: '286',
@@ -278,12 +323,17 @@ export default {
       previewError: '',
       previewUrl: '',
       previewFilename: '',
+      savingPreview: false,
       currentSatelliteName: '',
+      showCenterCrosshair: true,
 
       fullscreenVisible: false
     };
   },
   computed: {
+    selectedTarget() {
+      return this.satellites.find(s => s.code === this.selectedSat);
+    },
     hasResults() {
       return this.results.length > 0;
     },
@@ -311,7 +361,7 @@ export default {
         `${now.getUTCFullYear()}-${pad(now.getUTCMonth() + 1)}-${pad(now.getUTCDate())} ` +
         `${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())}`;
     },
-    onRadioChange() {
+    onSatelliteChange() {
       this.customSatellite = '';
     },
     onCustomChange(val) {
@@ -328,7 +378,7 @@ export default {
       const custom = (this.customSatellite || '').trim();
       if (custom) return custom;
       const found = this.satellites.find(s => s.code === this.selectedSat);
-      return found ? found.name.split(' ')[0] : 'Unknown';
+      return found ? found.name : 'Unknown';
     },
     parseLocalTimeToUtc(localStr) {
       const cleaned = localStr.replace(/[-:]/g, ' ').trim();
@@ -380,7 +430,11 @@ export default {
         };
         const res = await axios.post('/api/ephemeris/calculate', payload);
         if (res.data && res.data.success) {
-          this.results = res.data.data || [];
+          this.results = (res.data.data || []).map(row => ({
+            ...row,
+            de: normalizeDeclination(row.de),
+            de_pure: normalizeDeclination(row.de_pure)
+          }));
           if (this.results.length > 0) {
             // 自动预览第一条
             setTimeout(() => this.handlePreviewDSS(0), 300);
@@ -461,15 +515,80 @@ export default {
         this.previewLoading = false;
       }
     },
-    downloadCurrentPreview() {
-      if (!this.previewUrl) return;
-      const link = document.createElement('a');
-      link.href = this.previewImageSrc;
-      // 文件名优先由 Content-Disposition 控制，留 download 兜底
-      link.setAttribute('download', this.previewFilename || '');
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    async downloadCurrentPreview() {
+      if (!this.previewUrl || this.savingPreview) return;
+      // Capture the image and checkbox state at the moment Save is pressed.
+      const imageUrl = this.previewImageSrc;
+      const withCrosshair = this.showCenterCrosshair;
+      const originalFilename = this.previewFilename || 'dss_chart.gif';
+      const previewImage = this.$refs.previewImage;
+      const displayedWidth = previewImage ? previewImage.getBoundingClientRect().width : 0;
+      this.savingPreview = true;
+
+      try {
+        // Fetch through the authenticated API, then decode a local blob URL.
+        // This keeps cross-origin images from tainting the export canvas.
+        const response = await axios.get(imageUrl, { responseType: 'blob' });
+        let output = response.data;
+        let filename = originalFilename;
+        if (!output || !output.size) throw new Error('图片内容为空');
+
+        if (withCrosshair) {
+          const sourceUrl = URL.createObjectURL(output);
+          try {
+            const image = await new Promise((resolve, reject) => {
+              const img = new Image();
+              img.onload = () => resolve(img);
+              img.onerror = () => reject(new Error('图片解码失败'));
+              img.src = sourceUrl;
+            });
+            const canvas = document.createElement('canvas');
+            canvas.width = image.naturalWidth;
+            canvas.height = image.naturalHeight;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) throw new Error('浏览器不支持图片合成');
+            ctx.drawImage(image, 0, 0);
+
+            // Match the preview's four 6px arms, 3px centre gap and 1px stroke,
+            // scaled back to the original image resolution.
+            const scale = displayedWidth > 0 ? image.naturalWidth / displayedWidth : 1;
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.scale(scale, scale);
+            ctx.fillStyle = '#ff3b30';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+            ctx.shadowBlur = scale;
+            ctx.fillRect(-0.5, -9, 1, 6);
+            ctx.fillRect(3, -0.5, 6, 1);
+            ctx.fillRect(-0.5, 3, 1, 6);
+            ctx.fillRect(-9, -0.5, 6, 1);
+            ctx.restore();
+            output = await new Promise((resolve, reject) => {
+              canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('图片导出失败')), 'image/png');
+            });
+            filename = originalFilename.replace(/\.[^/.]+$/, '') + '_crosshair.png';
+          } finally {
+            URL.revokeObjectURL(sourceUrl);
+          }
+        }
+
+        const downloadUrl = URL.createObjectURL(output);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        try {
+          link.click();
+        } finally {
+          link.remove();
+          // Let the browser start reading the download before releasing the blob.
+          setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+        }
+      } catch (err) {
+        this.$message.error('保存图片失败，请重试：' + (err.message || '未知错误'));
+      } finally {
+        this.savingPreview = false;
+      }
     },
     openFullscreen() {
       if (!this.previewUrl) return;
@@ -570,45 +689,18 @@ export default {
   border-radius: 6px;
   padding: 8px;
   background: #fafafa;
-  max-height: 200px;
-  overflow-y: auto;
 }
 
-.satellite-radios {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 8px;
+.target-select {
+  width: 100%;
 }
 
-.sat-pill {
-  cursor: pointer;
-}
-
-.sat-pill input { display: none; }
-
-.sat-pill span {
-  display: inline-block;
-  padding: 4px 10px;
+.selected-target {
+  margin: 8px 0 0;
   font-size: 12px;
-  font-weight: 500;
-  background: #fff;
+  line-height: 1.5;
   color: #606266;
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-
-.sat-pill:hover span {
-  border-color: var(--brand);
-  color: var(--brand);
-}
-
-.sat-pill.active span {
-  background: var(--brand);
-  color: #fff;
-  border-color: var(--brand);
-  box-shadow: var(--shadow-brand);
+  overflow-wrap: anywhere;
 }
 
 .satellite-divider {
@@ -699,6 +791,18 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+}
+
+.preview-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.preview-actions >>> .el-checkbox {
+  margin-right: 0;
 }
 
 .preview-content {
@@ -740,6 +844,42 @@ export default {
   cursor: zoom-in;
 }
 
+.center-crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.crosshair-arm {
+  position: absolute;
+  display: block;
+  background: #ff3b30;
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.6);
+}
+
+.crosshair-top,
+.crosshair-bottom {
+  left: -0.5px;
+  width: 1px;
+  height: 6px;
+}
+
+.crosshair-left,
+.crosshair-right {
+  top: -0.5px;
+  width: 6px;
+  height: 1px;
+}
+
+.crosshair-top { bottom: 3px; }
+.crosshair-right { left: 3px; }
+.crosshair-bottom { top: 3px; }
+.crosshair-left { right: 3px; }
+
 .fov-badge {
   position: absolute;
   bottom: 8px;
@@ -758,13 +898,76 @@ export default {
   text-align: center;
 }
 
+.fullscreen-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-right: 34px;
+  font-weight: 600;
+}
+
+.fullscreen-title >>> .el-checkbox {
+  margin-right: 0;
+}
+
+.fullscreen-image-wrap {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  line-height: 0;
+}
+
 .fullscreen-img {
   max-width: 100%;
   max-height: 88vh;
-  display: inline-block;
+  display: block;
 }
 
 @media (max-width: 991px) {
   .preview-content { height: 360px; }
+}
+
+@media (max-width: 560px) {
+  .preview-header,
+  .preview-actions {
+    align-items: flex-start;
+  }
+
+  .preview-header {
+    flex-direction: column;
+  }
+}
+</style>
+
+<style>
+.ephemeris-target-options {
+  max-width: calc(100vw - 32px);
+}
+
+.ephemeris-target-options .el-select-dropdown__item {
+  height: auto;
+  min-height: 54px;
+  padding: 7px 20px;
+  line-height: 20px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.ephemeris-target-options .target-option-name,
+.ephemeris-target-options .target-option-detail {
+  display: block;
+}
+
+.ephemeris-target-options .target-option-detail {
+  font-size: 12px;
+  color: #606266;
+  font-weight: normal;
+}
+
+@media (max-width: 760px) {
+  .ephemeris-page .page-header h2 {
+    font-size: 20px;
+  }
 }
 </style>

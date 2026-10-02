@@ -37,12 +37,29 @@
         锁定
       </button>
 
+      <el-drawer
+          v-if="isMobile"
+          title="网站导航"
+          :visible.sync="mobileMenuOpen"
+          direction="ltr"
+          size="min(320px, 88vw)"
+          custom-class="mobile-navigation"
+          append-to-body>
+        <nav aria-label="手机端网站导航">
+          <SideNav @navigate="mobileMenuOpen = false"></SideNav>
+          <div class="mobile-navigation-links">
+            <router-link to="/paper" @click.native="mobileMenuOpen = false">论文 PAPER</router-link>
+            <router-link to="/aiagent" @click.native="mobileMenuOpen = false">学术 AI 助手</router-link>
+          </div>
+        </nav>
+      </el-drawer>
+
       <el-container class="app-container">
         <el-header>
-          <Header></Header>
+          <Header :menu-open="mobileMenuOpen" @toggle-menu="mobileMenuOpen = !mobileMenuOpen"></Header>
         </el-header>
         <el-container class="body-container">
-          <el-aside width="240px" v-if="showSideNav" class="app-aside">
+          <el-aside width="240px" v-if="showSideNav && !isMobile" class="app-aside">
             <SideNav></SideNav>
           </el-aside>
           <el-main>
@@ -74,17 +91,20 @@
 
 <script>
 import axios from 'axios'
+import mobileViewport from './mixins/mobileViewport'
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import SideNav from "./components/SideNav";
 
 export default {
   name: 'App',
+  mixins: [mobileViewport],
   components: {
     Footer, Header, SideNav
   },
   data() {
     return {
+      mobileMenuOpen: false,
       checkingAccess: true,
       accessUnlocked: false,
       accessKey: '',
@@ -97,6 +117,10 @@ export default {
       const hidden = ['/paper', '/aiagent'];
       return !hidden.includes(this.$route.path);
     }
+  },
+  watch: {
+    '$route.fullPath'() { this.mobileMenuOpen = false },
+    isMobile(value) { if (!value) this.mobileMenuOpen = false }
   },
   created() {
     window.addEventListener('astronomy-access-required', this.requireAccess)
@@ -128,7 +152,10 @@ export default {
         this.accessUnlocked = true
         this.accessKey = ''
       } catch (err) {
-        this.accessError = '密钥错误，请重新输入。'
+        const status = err && err.response ? err.response.status : null
+        this.accessError = status === 401
+            ? '密钥错误，请重新输入。'
+            : '验证服务暂时无法连接，请稍后再试。'
       } finally {
         this.unlocking = false
       }
@@ -141,6 +168,7 @@ export default {
       }
     },
     requireAccess() {
+      this.mobileMenuOpen = false
       this.checkingAccess = false
       this.accessUnlocked = false
       this.accessError = '访问已锁定，请输入密钥。'

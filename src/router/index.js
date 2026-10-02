@@ -60,6 +60,8 @@ const routes = [
     { path: '/data/spectrum', component: Placeholder, meta: { title: '光谱数据' } },
     { path: '/data/spectrum/release', component: Placeholder, meta: { title: '光谱数据 - 空间释放数据' } },
 
+    { path: '/services/observation/reports', name: 'ObservationReports', component: () => import('../components/ObservationReports.vue'), meta: { title: '历史观测报告' } },
+
     // 网站服务 - 占位
     { path: '/services/observation/ephemeris', name: 'EphemerisTool', component: EphemerisTool, meta: { title: '天然卫星星历与寻星图工具' } },
     { path: '/services/observation/exposure-calculator', name: 'ExposureCalculator', component: ExposureCalculator, meta: { title: '曝光时间计算器' } },

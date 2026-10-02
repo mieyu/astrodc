@@ -84,7 +84,7 @@
         :formatter="cellFormatter"
         show-overflow-tooltip>
       </el-table-column>
-      <el-table-column label="操作" width="160" align="center" header-align="center" fixed="right">
+      <el-table-column label="操作" width="160" align="center" header-align="center" :fixed="isMobile ? false : 'right'">
         <template slot-scope="scope">
           <div class="np-row-actions">
             <el-button size="mini" @click="openDetail(scope.row)">详情</el-button>
@@ -99,6 +99,7 @@
       class="np-pagination"
       background
       layout="total, sizes, prev, pager, next, jumper"
+      :pager-count="isMobile ? 5 : 7"
       :current-page="page"
       :page-size="pageSize"
       :page-sizes="[20, 50, 100, 200, 500]"
@@ -111,7 +112,7 @@
     <el-drawer
       :visible.sync="detailVisible"
       direction="rtl"
-      size="55%"
+      :size="isMobile ? '100%' : '55%'"
       :with-header="false">
       <div v-if="detailRow" class="np-detail">
         <div class="np-detail-head">
@@ -124,7 +125,7 @@
         </div>
         <div v-for="g in columnGroups" :key="g.key" class="np-detail-group">
           <h4>{{ g.label }}</h4>
-          <el-descriptions :column="2" border size="small">
+          <el-descriptions :column="isMobile ? 1 : 2" border size="small">
             <el-descriptions-item v-for="prop in g.props" :key="prop" :label="prop">
               <a v-if="isSourceLink(prop) && detailRow[prop]" :href="detailRow[prop]" target="_blank" rel="noopener">{{ detailRow[prop] }}</a>
               <span v-else>{{ formatValue(detailRow[prop]) }}</span>
@@ -137,6 +138,7 @@
 </template>
 
 <script>
+import mobileViewport from '../mixins/mobileViewport';
 import axios from 'axios';
 
 const ALL_COLUMNS = [
@@ -212,6 +214,7 @@ const LS_KEY_EXTRA = 'np_extra_columns';
 const LS_KEY_VIEW = 'np_view_mode';
 
 export default {
+  mixins: [mobileViewport],
   name: 'NormalizedPositioning',
   data() {
     return {

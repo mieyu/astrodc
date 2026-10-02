@@ -1,0 +1,194 @@
+/* Mobile-only overrides. Desktop component styles stay authoritative above 768px. */
+.mobile-menu-toggle { display: none; }
+
+@media (max-width: 768px) {
+  #app .app-container, #app .body-container, #app .el-main {
+    min-width: 0;
+    width: 100%;
+  }
+  #app .body-container { flex-direction: column; }
+  #app .app-aside { display: none; }
+  #app .app-container > .el-header { position: relative; height: 60px !important; }
+  #app .el-header .header-container { padding: 0 72px 0 10px; justify-content: flex-start; gap: 8px; }
+  #app .header-title { font-size: 17px; letter-spacing: 0; white-space: nowrap; }
+  #app .el-header .el-menu-right { display: none; }
+  #app .mobile-menu-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0; width: 44px; height: 44px; padding: 0;
+    color: var(--brand); background: var(--brand-soft); border: 0;
+    border-radius: 8px; font-size: 22px; cursor: pointer;
+  }
+  #app .access-logout-btn { position: absolute; top: 8px; right: 10px; height: 44px; border-radius: 8px; }
+  #app .access-lock { padding: 16px; min-height: 100vh; min-height: 100dvh; }
+  #app .access-panel { padding: 28px 20px; }
+  /* The assistant is available in the mobile menu, leaving form controls clear. */
+  #app .global-robot-btn { display: none; }
+  #app .site-footer { padding: 18px 12px calc(28px + env(safe-area-inset-bottom, 0px)); font-size: 12px; }
+  .mobile-navigation .el-drawer__header { margin-bottom: 8px; padding: 16px; color: var(--text-strong); font-weight: 600; }
+  .mobile-navigation .el-drawer__close-btn { width: 44px; height: 44px; }
+  .mobile-navigation .el-drawer__body { overflow-y: auto; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .mobile-navigation .side-nav:not(.el-menu--collapse) { width: 100%; height: auto; }
+  .mobile-navigation-links { display: grid; gap: 8px; padding: 16px 20px; border-top: 1px solid var(--border); }
+  .mobile-navigation-links a { display: flex; align-items: center; min-height: 44px; color: var(--brand); text-decoration: none; }
+
+  /* Shared page spacing; flex children must shrink around scrollable tables. */
+  #app .el-main > * { min-width: 0; box-sizing: border-box; }
+  #app .home, #app .hub, #app .paper-page, #app .condition-form,
+  #app .data-visualization-container, #app .cbc-container,
+  #app .ephemeris-page, #app .exposure-page, #app .ai-agent,
+  #app .placeholder-container { padding: 14px 12px 24px; }
+  #app .table-list-container, #app .np-container, #app .parser-container,
+  #app .file-browser-container, #app .cbc-container.cbc-table-mode {
+    margin: 12px; padding: 14px 12px;
+  }
+  #app .home .panel, #app .hub .panel, #app .cbc-head-panel,
+  #app .quick-actions-section, #app .condition-section,
+  #app .sql-box, #app .summary-box, #app .data-box, #app .example-queries {
+    min-width: 0; padding: 18px 14px;
+  }
+  #app .home .columns, #app .hub .columns { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  #app .home .services-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+  #app .home .service-card { padding: 18px 10px; }
+  #app .home .intro { margin-bottom: 14px; }
+  #app .home .intro-header { gap: 10px; }
+  #app .home .intro-logo { width: 32px; height: 32px; flex-shrink: 0; }
+  #app .home .intro-title-wrap { min-width: 0; }
+  #app .home .intro-title-wrap h1, #app .hub .head h2,
+  #app .cbc-title, #app .page-header h2, #app .ai-agent .header h1,
+  #app .parser-container h2, #app .placeholder-card h2 { font-size: 20px; line-height: 1.5; }
+  #app .home .subtitle { font-size: 12px; line-height: 1.6; }
+  #app .news-list li { flex-direction: column; gap: 6px; }
+  #app .intro-desc, #app .hub .head p, #app .cbc-summary { text-indent: 0; font-size: 14px; line-height: 1.85; }
+  #app .hub .entry { padding: 14px 12px; }
+  #app .app-back-bar { gap: 8px; margin-bottom: 14px; }
+  #app .app-back-button { min-height: 44px; height: auto; }
+  #app .app-back-actions { flex-wrap: wrap; }
+  #app .app-back-context, #app .breadcrumb-path { overflow-wrap: anywhere; box-sizing: border-box; }
+  #app .toolbar-container { flex-direction: row; align-items: center; }
+  #app .el-card__header { padding: 14px; }
+  #app .el-card__body { padding: 14px; }
+  #app .page-header { margin-bottom: 18px; }
+  #app .page-header h2 { margin-top: 0; }
+
+  /* Touch controls and filters. Retain both range endpoints and all actions. */
+  #app .el-input__inner, #app .el-textarea__inner, #app .ai-agent textarea { font-size: 16px; }
+  #app .el-input__inner { min-height: 40px; }
+  #app .el-input-number { line-height: 38px; }
+  #app .el-button { min-height: 40px; }
+  #app .el-radio-button__inner { min-height: 40px; box-sizing: border-box; display: inline-flex; align-items: center; }
+  #app .np-filter-bar, #app .cbc-filter-bar { padding: 12px; }
+  #app .np-filter-bar .el-form-item, #app .cbc-filter-bar .el-form-item { display: block; margin: 0 0 14px; }
+  #app .np-filter-bar .el-form-item__label, #app .cbc-filter-bar .el-form-item__label { display: block; float: none; text-align: left; line-height: 24px; padding-bottom: 4px; }
+  #app .np-filter-bar .el-form-item__content, #app .cbc-filter-bar .el-form-item__content { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; width: 100%; }
+  #app .np-filter-bar .el-select, #app .np-filter-bar .el-form-item__content > .el-input { width: 100% !important; }
+  #app .np-filter-bar .el-input-number, #app .cbc-filter-bar .el-input-number { flex: 1; min-width: 0; width: 0 !important; }
+  #app .np-range-sep, #app .cbc-range-sep { margin: 0; }
+  #app .np-filter-bar .el-button, #app .cbc-filter-bar .el-button { margin-left: 0; flex: 1; padding: 10px 8px; }
+  #app .np-view-toolbar { flex-wrap: wrap; gap: 10px; }
+
+  /* Tables scroll inside their own viewport, with wrapping pagination below. */
+  #app .el-table { width: 100%; max-width: 100%; min-width: 0; flex: none; }
+  #app .el-table__body-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #app .el-pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 2px; padding: 12px 0 0; white-space: normal; }
+  #app .el-pagination .el-pagination__total { flex-basis: 100%; margin: 0; text-align: center; }
+  #app .el-pagination .el-pagination__sizes { order: 2; margin: 0; }
+  #app .el-pagination .el-pagination__jump { order: 3; margin: 0; }
+  #app .el-pagination .el-input__inner { min-height: 32px; }
+  #app .el-pagination .el-pager { white-space: nowrap; }
+  #app .el-pagination button, #app .el-pagination .el-pager li { min-height: 36px; line-height: 36px; }
+  #app .pagination-block { padding: 0; }
+
+  /* The query table becomes a form card for each field on a phone. */
+  #app .condition-form .section-header { margin-bottom: 18px; }
+  #app .condition-form .section-header h2 { font-size: 20px; }
+  #app .condition-form .quick-actions, #app .condition-form .action-buttons { gap: 10px; }
+  #app .condition-form .quick-actions .el-button, #app .condition-form .action-buttons .el-button { max-width: none; margin-left: 0; }
+  #app .condition-form .table-container { border: 0; box-shadow: none; margin: 18px 0; }
+  #app .condition-table, #app .condition-table .el-table__body-wrapper { border: 0; overflow: visible; }
+  #app .condition-table::before, #app .condition-table::after,
+  #app .condition-table .el-table__header-wrapper, #app .condition-table colgroup { display: none; }
+  #app .condition-table .el-table__body { width: 100% !important; display: block; }
+  #app .condition-table tbody { display: grid; gap: 12px; }
+  #app .condition-table .el-table__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-subtle); }
+  #app .condition-table td { display: block; width: auto !important; min-width: 0; border: 0; padding: 0; background: transparent; }
+  #app .condition-table td .cell { padding: 0; }
+  #app .condition-table td:first-child { align-self: center; font-weight: 600; color: var(--text-strong); }
+  #app .condition-table td:nth-child(2) .el-checkbox { display: flex; align-items: center; min-height: 44px; }
+  #app .condition-table td:nth-child(2) .el-checkbox__label::before { content: '启用'; }
+  #app .condition-table td:nth-child(n+3) { grid-column: 1 / -1; padding-top: 8px; }
+  #app .condition-table td:nth-child(4) .cell::before { content: '示例：'; color: var(--text-muted); }
+  #app .condition-table td:nth-child(5) .cell::before { content: '类型：'; color: var(--text-muted); }
+  #app .condition-table td:nth-child(n+4) { font-size: 12px; overflow-wrap: anywhere; }
+  #app .condition-table .input-pair-container { flex-direction: column; gap: 8px; }
+  #app .condition-table .el-input, #app .condition-table .el-select { width: 100%; min-width: 0; }
+  #app .condition-table .el-radio-group { display: flex; flex-wrap: wrap; gap: 10px; }
+  #app .condition-table .el-radio { margin-right: 8px; line-height: 40px; }
+
+  #app .paper-card { flex-direction: column; }
+  #app .paper-aside { width: 100%; padding: 12px; border-right: 0; border-bottom: 1px solid var(--border); }
+  #app .paper-menu { display: flex; overflow-x: auto; gap: 6px; }
+  #app .paper-menu .el-menu-item { flex-shrink: 0; min-height: 44px; margin: 0; }
+  #app .paper-main { padding: 16px 12px; }
+  #app .paper-empty { min-height: 240px !important; }
+  #app .paper-empty p { font-size: 14px; }
+  #app .cbc-catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  #app .cbc-catalog-card { min-width: 0; padding: 14px 12px; }
+  #app .cbc-catalog-key { font-size: 18px; }
+  #app .cbc-map-head { flex-wrap: wrap; }
+  #app .cbc-map-figure img { min-width: 0; box-sizing: border-box; }
+  #app .data-visualization-container .header-container { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px; }
+  #app .visualization-content { flex-direction: column; }
+  #app .visualization-content .left-panel, #app .visualization-content .right-panel { min-width: 0; padding: 12px; }
+  #app .stat-item { min-width: 0; padding: 10px 6px; }
+  #app .stat-chart { height: 280px; }
+  #app .upload-wrapper { margin: 20px auto; }
+  #app .upload-dragger .el-upload, #app .upload-dragger .el-upload-dragger { width: 100%; }
+  #app .upload-dragger .el-upload-dragger { height: auto; min-height: 200px; }
+  #app .upload-content { padding: 20px 12px; box-sizing: border-box; }
+  #app .export-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+  #app .export-buttons .el-button { margin-left: 0; }
+  #app .exposure-page .cam-collapse .el-col { width: 100%; margin-bottom: 12px; }
+  #app .exposure-page .preview-head, #app .exposure-page .result-head { flex-wrap: wrap; gap: 8px; }
+  #app .exposure-page .file-name { overflow-wrap: anywhere; }
+  #app .exposure-page .report { overflow-x: auto; }
+  #app .exposure-page .canvas-wrap { overflow: auto; }
+  #app .ephemeris-page .preview-actions { flex-wrap: wrap; gap: 8px; }
+  #app .ephemeris-page .preview-content { height: 300px; }
+  #app .ai-agent { min-height: 70vh; }
+  #app .ai-agent .input-group { flex-direction: column; }
+  #app .ai-agent textarea { min-width: 0; width: 100%; box-sizing: border-box; }
+  #app .ai-agent .empty-state { margin: 24px auto; }
+  #app .ai-agent .example-btn { overflow-wrap: anywhere; line-height: 1.6; }
+  #app .ai-agent .summary-content { overflow-wrap: anywhere; overflow-x: auto; }
+  #app .placeholder-card { min-width: 0; max-width: 100%; padding: 32px 18px; box-sizing: border-box; }
+  #app .placeholder-card .path { overflow-wrap: anywhere; }
+
+  /* Element UI portals are appended to body, outside #app. */
+  .el-dialog { width: calc(100% - 24px) !important; margin-top: 4vh !important; margin-bottom: 4vh; }
+  .el-dialog__header { padding: 18px 48px 12px 14px; }
+  .el-dialog__headerbtn { top: 8px; right: 6px; width: 40px; height: 40px; }
+  .el-dialog__body { padding: 14px; }
+  .el-dialog__footer { padding: 10px 14px 18px; }
+  .el-dialog .dialog-footer { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+  .el-dialog .dialog-footer .el-button { margin-left: 0; min-height: 40px; }
+  .el-dialog .fits-dialog-title { flex-direction: column; gap: 4px; }
+  .el-dialog .fits-dialog-filename { max-width: 100%; }
+  .fits-preview-toolbar .el-button-group { display: flex; flex-wrap: wrap; }
+  .fits-preview-toolbar .el-button { padding: 10px 8px; min-height: 40px; }
+  .fullscreen-title { flex-wrap: wrap; gap: 8px; }
+  .el-drawer .np-detail, .el-drawer .cbc-detail { padding: 16px 12px; }
+  .el-drawer .np-detail-head, .el-drawer .cbc-detail-head { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .np-detail-head > div, .cbc-detail-head > div { display: flex; flex-wrap: wrap; gap: 8px; }
+  .np-detail-head .el-button, .cbc-detail-head .el-button { margin-left: 0; min-height: 40px; }
+  .el-drawer .np-detail .el-descriptions__label, .el-drawer .cbc-detail .el-descriptions__label { width: 38%; max-width: 120px; overflow-wrap: anywhere; }
+  .np-detail .el-descriptions__table, .cbc-detail .el-descriptions__table { table-layout: fixed; }
+  .el-message-box { width: calc(100% - 32px); box-sizing: border-box; }
+  .el-message { min-width: 0; width: calc(100% - 24px); padding: 12px; box-sizing: border-box; }
+  .el-message__content { line-height: 1.6; overflow-wrap: anywhere; }
+  .el-select-dropdown, .el-popover { max-width: calc(100vw - 24px); min-width: 0 !important; box-sizing: border-box; }
+  .el-select-dropdown__item { max-width: 100%; }
+  .el-date-picker { width: min(322px, calc(100vw - 16px)); }
+  .el-date-picker .el-picker-panel__content { width: auto; margin: 10px; }
+  .el-date-picker .el-date-picker__time-header { padding: 8px; }
+  .el-date-picker .el-time-panel { width: min(180px, calc(100vw - 40px)); }
+}

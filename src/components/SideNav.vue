@@ -3,6 +3,7 @@
       :default-active="$route.path"
       :default-openeds="defaultOpeneds"
       class="side-nav"
+      @select="$emit('navigate')"
       router
       background-color="#ffffff"
       text-color="#606266"
@@ -60,6 +61,7 @@
         </template>
         <el-menu-item index="/services/observation/ephemeris">天然卫星星历与寻星图</el-menu-item>
         <el-menu-item index="/services/observation/exposure-calculator">曝光时间计算器</el-menu-item>
+        <el-menu-item index="/services/observation/reports">历史观测报告</el-menu-item>
       </el-submenu>
 
       <el-submenu index="services-prediction">

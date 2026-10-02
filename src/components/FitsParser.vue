@@ -39,17 +39,19 @@
       </div>
       <el-table :data="headerData" border height="500" style="width: 100%">
         <el-table-column prop="keyword" label="关键字 (Keyword)" width="180"></el-table-column>
-        <el-table-column prop="value" label="值 (Value)"></el-table-column>
-        <el-table-column prop="comment" label="注释 (Comment)"></el-table-column>
+        <el-table-column prop="value" label="值 (Value)" :min-width="isMobile ? 140 : undefined"></el-table-column>
+        <el-table-column prop="comment" label="注释 (Comment)" :min-width="isMobile ? 200 : undefined"></el-table-column>
       </el-table>
     </div>
   </div>
 </template>
 
 <script>
+import mobileViewport from '../mixins/mobileViewport';
 import axios from 'axios';  // 导入全局配置的axios实例
 
 export default {
+  mixins: [mobileViewport],
   name: 'FitsParser',
   data() {
     return {

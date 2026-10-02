@@ -6,6 +6,7 @@ import './assets/theme.css'
 import './assets/back-navigation.css'
 import axios from 'axios'
 import router from './router' // 导入路由
+import './assets/mobile.css'
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)

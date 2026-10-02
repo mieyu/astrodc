@@ -14,7 +14,7 @@
     </div>
 
     <el-table :data="files" v-loading="loading" style="width: 100%">
-      <el-table-column label="名称" prop="name">
+      <el-table-column label="名称" prop="name" :min-width="isMobile ? 180 : undefined">
         <template slot-scope="scope">
           <i :class="scope.row.type === 'directory' ? 'el-icon-folder' : 'el-icon-document'"></i>
           <a href="#" @click.prevent="handleItemClick(scope.row)" class="file-link">
@@ -22,12 +22,12 @@
           </a>
         </template>
       </el-table-column>
-      <el-table-column label="大小" prop="size" width="180">
+      <el-table-column label="大小" prop="size" :width="isMobile ? 90 : 180">
         <template slot-scope="scope">
           {{ formatSize(scope.row.size) }}
         </template>
       </el-table-column>
-      <el-table-column label="类型" prop="type" width="180">
+      <el-table-column label="类型" prop="type" :width="isMobile ? 90 : 180">
         <template slot-scope="scope">
           {{ scope.row.type === 'directory' ? '文件夹' : '文件' }}
         </template>
@@ -37,9 +37,11 @@
 </template>
 
 <script>
+import mobileViewport from '../mixins/mobileViewport';
 import axios from 'axios';
 
 export default {
+  mixins: [mobileViewport],
   name: 'FileBrowser',
   data() {
     return {

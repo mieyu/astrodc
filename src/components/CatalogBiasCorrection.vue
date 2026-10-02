@@ -86,7 +86,7 @@
         :formatter="cellFormatter"
         show-overflow-tooltip>
       </el-table-column>
-      <el-table-column label="操作" width="190" align="center" header-align="center" fixed="right">
+      <el-table-column label="操作" width="190" align="center" header-align="center" :fixed="isMobile ? false : 'right'">
         <template slot-scope="scope">
           <div class="cbc-row-actions">
             <el-button size="mini" icon="el-icon-document" @click="openDetail(scope.row)">详情</el-button>
@@ -101,6 +101,7 @@
       class="cbc-pagination"
       background
       layout="total, sizes, prev, pager, next, jumper"
+      :pager-count="isMobile ? 5 : 7"
       :current-page="page"
       :page-size="pageSize"
       :page-sizes="[20, 50, 100, 200, 500]"
@@ -112,7 +113,7 @@
     <el-drawer
       :visible.sync="detailVisible"
       direction="rtl"
-      size="55%"
+      :size="isMobile ? '100%' : '55%'"
       :with-header="false">
       <div v-if="detailRow" class="cbc-detail">
         <div class="cbc-detail-head">
@@ -133,7 +134,7 @@
 
         <div v-for="group in detailGroups" :key="group.key" class="cbc-detail-group">
           <h4>{{ group.label }}</h4>
-          <el-descriptions :column="2" border size="small">
+          <el-descriptions :column="isMobile ? 1 : 2" border size="small">
             <el-descriptions-item v-for="prop in group.props" :key="prop" :label="prop">
               {{ formatValue(detailRow[prop]) }}
             </el-descriptions-item>
@@ -145,6 +146,7 @@
 </template>
 
 <script>
+import mobileViewport from '../mixins/mobileViewport';
 import axios from 'axios';
 
 const CATALOGS = [
@@ -189,6 +191,7 @@ const FALLBACK_COLUMNS = [
 ];
 
 export default {
+  mixins: [mobileViewport],
   name: 'CatalogBiasCorrection',
   data() {
     return {

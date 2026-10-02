@@ -1,5 +1,9 @@
 <template>
   <div class="header-container">
+    <button type="button" class="mobile-menu-toggle" aria-label="打开网站导航"
+            :aria-expanded="String(menuOpen)" @click="$emit('toggle-menu')">
+      <i class="el-icon-menu" aria-hidden="true"></i>
+    </button>
     <span class="header-title">天然卫星数据中心</span>
 
     <el-menu
@@ -19,6 +23,7 @@
 <script>
 export default {
   name: 'Header',
+  props: { menuOpen: { type: Boolean, default: false } },
   computed: {
     // 使用计算属性动态设置当前激活的菜单项
     // 如果当前路由是根路径，则'首页'菜单高亮

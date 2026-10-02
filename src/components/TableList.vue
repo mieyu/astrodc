@@ -23,15 +23,14 @@
         size="mini"
         stripe>
       <el-table-column type="index" label="#" width="60" align="center"></el-table-column>
-      <el-table-column prop="pwd" label="文件地址" width="600" sortable="custom" show-overflow-tooltip>
+      <el-table-column prop="pwd" label="文件地址" :width="isMobile ? 220 : 600" sortable="custom" show-overflow-tooltip>
         <template slot-scope="scope">
           <a href="#" @click.prevent="handleFileDownload(scope.row)" class="file-link">{{ scope.row.pwd }}</a>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="180" align="center">
+      <el-table-column label="操作" width="90" align="center">
         <template slot-scope="scope">
           <el-button size="mini" type="success" plain @click="handlePreview(scope.row)">预览</el-button>
-          <el-button size="mini" type="primary" plain @click="handleModify(scope.row)">修改</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="fitName" label="FIT-NAME" width="130" sortable="custom" :formatter="cellFormatter" show-overflow-tooltip></el-table-column>
@@ -71,45 +70,56 @@
           :page-size="pageSize"
           :page-sizes="[50, 100, 300, 700, 1000]"
           layout="total, sizes, prev, pager, next, jumper"
+      :pager-count="isMobile ? 5 : 7"
           :total="totalItems">
       </el-pagination>
     </div>
 
-    <el-dialog title="修改记录" :visible.sync="dialogVisible" width="70%" top="5vh">
-      <div class="edit-form-container">
-        <el-table :data="editFields" border style="width: 100%">
-          <el-table-column prop="label" label="字段名" width="180"></el-table-column>
-          <el-table-column prop="value" label="值">
-            <template slot-scope="scope">
-              <el-input v-if="scope.row.key === 'pwd'" v-model="editForm[scope.row.key]" disabled></el-input>
-              <el-radio-group v-else-if="isRadioField(scope.row.key)" v-model="editForm[scope.row.key]">
-                <el-radio :label="1">正常</el-radio>
-                <el-radio :label="0">错误</el-radio>
-              </el-radio-group>
-              <el-select v-else-if="isSelectField(scope.row.key)" v-model="editForm[scope.row.key]" placeholder="请选择" filterable clearable>
-                <el-option v-for="item in selectOptions[scope.row.key]" :key="item" :label="item" :value="item"></el-option>
-              </el-select>
-              <el-date-picker v-else-if="scope.row.key === 'dateObs'" v-model="editForm[scope.row.key]" type="datetime" placeholder="选择日期时间" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
-              <el-input v-else v-model="editForm[scope.row.key]"></el-input>
-            </template>
-          </el-table-column>
-        </el-table>
+    <el-dialog
+        :visible.sync="fitsDialogVisible"
+        width="82%"
+        top="5vh"
+        append-to-body
+        :close-on-click-modal="false"
+        @closed="handleFitsDialogClosed">
+      <div slot="title" class="fits-dialog-title">
+        <span>FITS 图像预览</span>
+        <span v-if="currentFitsName" class="fits-dialog-filename">{{ currentFitsName }}</span>
       </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitUpdate">确 定 修 改</el-button>
-      </span>
-    </el-dialog>
 
-    <el-dialog title="FITS 图像预览" :visible.sync="fitsDialogVisible" width="50%">
-      <div v-loading="fitsImageLoading" class="fits-image-container">
-        <img v-if="fitsImageUrl" :src="fitsImageUrl" alt="FITS 图像" style="max-width: 100%;"/>
-        <span v-else>图像加载失败</span>
+      <div class="fits-preview-toolbar">
+        <span class="fits-zoom-label">{{ Math.round(fitsPreviewZoom * 100) }}%</span>
+        <el-button-group>
+          <el-button size="mini" icon="el-icon-zoom-out" :disabled="!fitsImageUrl || fitsPreviewZoom <= 0.5" @click="changeFitsZoom(-0.25)">缩小</el-button>
+          <el-button size="mini" icon="el-icon-refresh-left" :disabled="!fitsImageUrl" @click="rotateFitsPreview">旋转</el-button>
+          <el-button size="mini" icon="el-icon-refresh" :disabled="!fitsImageUrl" @click="resetFitsPreviewView">重置</el-button>
+          <el-button size="mini" icon="el-icon-zoom-in" :disabled="!fitsImageUrl || fitsPreviewZoom >= 3" @click="changeFitsZoom(0.25)">放大</el-button>
+        </el-button-group>
+      </div>
+
+      <div
+          v-loading="fitsImageLoading"
+          element-loading-text="正在生成 FITS 预览…"
+          class="fits-image-container">
+        <div v-if="fitsPreviewError" class="fits-preview-error">
+          <i class="el-icon-picture-outline"></i>
+          <p>{{ fitsPreviewError }}</p>
+          <el-button size="small" type="primary" plain @click="retryFitsPreview">重新加载</el-button>
+        </div>
+        <img
+            v-else-if="fitsImageUrl"
+            :src="fitsImageUrl"
+            :alt="currentFitsName || 'FITS 图像'"
+            :style="fitsImageStyle"
+            class="fits-preview-image"
+            @load="handleFitsImageLoaded"
+            @error="handleFitsImageError"/>
       </div>
       <div class="preview-disclaimer">
-        仅简单展示，请使用更加专业的工具打开图片
+        预览采用百分位裁剪和非线性拉伸，仅用于快速查看；科学分析请下载原始 FITS 文件。
       </div>
       <span slot="footer" class="dialog-footer">
+        <el-button v-if="currentFitsRow" icon="el-icon-download" @click="handleFileDownload(currentFitsRow)">下载原始文件</el-button>
         <el-button @click="fitsDialogVisible = false">关 闭</el-button>
       </span>
     </el-dialog>
@@ -118,9 +128,11 @@
 </template>
 
 <script>
+import mobileViewport from '../mixins/mobileViewport';
 import axios from "axios";
 
 export default {
+  mixins: [mobileViewport],
   name: 'TableList',
   data() {
     return {
@@ -132,20 +144,23 @@ export default {
       searchQuery: {},
       sortField: '',
       sortOrder: '',
-      dialogVisible: false,
-      editForm: {},
-      editFields: [],
-      selectOptions: {
-        object: [],
-        imagetyp: [],
-        tele: [],
-        teleap: [],
-        telefl: [],
-        filter: []
-      },
       fitsDialogVisible: false,
       fitsImageUrl: '',
-      fitsImageLoading: false
+      fitsImageLoading: false,
+      fitsPreviewError: '',
+      fitsPreviewZoom: 1,
+      fitsPreviewRotation: 0,
+      fitsPreviewController: null,
+      currentFitsRow: null,
+      currentFitsName: ''
+    }
+  },
+  computed: {
+    fitsImageStyle() {
+      return {
+        width: `${this.fitsPreviewZoom * 100}%`,
+        transform: `rotate(${this.fitsPreviewRotation}deg)`
+      };
     }
   },
   watch: {
@@ -218,64 +233,88 @@ export default {
     tableRowClassName({row, rowIndex}) {
       return rowIndex % 2 === 1 ? 'warning-row' : 'success-row';
     },
-    isRadioField(key) {
-      return ['simple', 'otcd', 'rotCode', 'flipx', 'flipy'].includes(key);
-    },
-    isSelectField(key) {
-      return ['object', 'imagetyp', 'tele', 'teleap', 'telefl', 'filter'].includes(key);
-    },
-    handleModify(row) {
-      this.editForm = JSON.parse(JSON.stringify(row));
-      this.editFields = Object.keys(this.editForm).map(key => ({
-        key: key,
-        label: key.toUpperCase().replace('-', '_')
-      }));
-      this.dialogVisible = true;
-    },
-    async submitUpdate() {
-      try {
-        const response = await axios.put('/api/image/own/update', this.editForm);
-        if (response.data.code === 1) {
-          this.$message.success('更新成功！');
-          this.dialogVisible = false;
-          this.fetchData();
-        } else {
-          this.$message.error('更新失败: ' + response.data.message);
-        }
-      } catch (error) {
-        this.$message.error('请求失败: ' + error.message);
-      }
-    },
-    async fetchSelectOptions() {
-      try {
-        const response = await axios.get('/api/image/own/options');
-        if (response.data.code === 1) {
-          this.selectOptions = response.data.data;
-        } else {
-          console.error('获取下拉选项失败:', response.data.message);
-        }
-      } catch (error) {
-        console.error('请求下拉选项时发生错误:', error);
-      }
-    },
-    handlePreview(row) {
+    async handlePreview(row) {
+      this.cancelFitsPreviewRequest();
+      this.releaseFitsImageUrl();
+      this.currentFitsRow = row;
+      this.currentFitsName = row.fitName || row.pwd.split(/[\\/]/).pop();
       this.fitsDialogVisible = true;
       this.fitsImageLoading = true;
-      this.fitsImageUrl = '';
-      const url = `${axios.defaults.baseURL}/fits/image?path=${encodeURIComponent(row.pwd)}`;
-      this.fitsImageUrl = url;
-      this.$nextTick(() => {
-        const img = this.$el.querySelector('.fits-image-container img');
-        if (img) {
-          img.onload = () => { this.fitsImageLoading = false; };
-          img.onerror = () => {
-            this.fitsImageLoading = false;
-            this.$message.error("图像加载失败！");
-          };
-        } else {
-          this.fitsImageLoading = false;
+      this.fitsPreviewError = '';
+      this.resetFitsPreviewView();
+
+      const controller = new AbortController();
+      this.fitsPreviewController = controller;
+      try {
+        const response = await axios.get('/fits/image', {
+          params: { path: row.pwd },
+          responseType: 'blob',
+          signal: controller.signal
+        });
+        if (this.fitsPreviewController !== controller || !this.fitsDialogVisible) return;
+        if (!response.data || response.data.size === 0) {
+          throw new Error('服务器返回了空预览');
         }
-      });
+        this.fitsImageUrl = window.URL.createObjectURL(response.data);
+      } catch (error) {
+        if (axios.isCancel(error) || error.code === 'ERR_CANCELED') return;
+        if (this.fitsPreviewController === controller) {
+          this.fitsImageLoading = false;
+          this.fitsPreviewError = this.getFitsPreviewError(error);
+        }
+      } finally {
+        if (this.fitsPreviewController === controller) {
+          this.fitsPreviewController = null;
+        }
+      }
+    },
+    retryFitsPreview() {
+      if (this.currentFitsRow) this.handlePreview(this.currentFitsRow);
+    },
+    handleFitsImageLoaded() {
+      this.fitsImageLoading = false;
+    },
+    handleFitsImageError() {
+      this.fitsImageLoading = false;
+      this.fitsPreviewError = '图像解码失败，请重新加载或下载原始文件检查。';
+      this.releaseFitsImageUrl();
+    },
+    getFitsPreviewError(error) {
+      const status = error.response && error.response.status;
+      if (status === 404) return '没有找到对应的 FITS 文件。';
+      if (status === 401) return '访问凭证已失效，请重新输入网站访问密码。';
+      if (status >= 500) return '服务器暂时无法生成该预览，请稍后重试。';
+      return `图像加载失败：${error.message || '未知错误'}`;
+    },
+    changeFitsZoom(delta) {
+      this.fitsPreviewZoom = Math.min(3, Math.max(0.5, this.fitsPreviewZoom + delta));
+    },
+    rotateFitsPreview() {
+      this.fitsPreviewRotation = (this.fitsPreviewRotation + 90) % 360;
+    },
+    resetFitsPreviewView() {
+      this.fitsPreviewZoom = 1;
+      this.fitsPreviewRotation = 0;
+    },
+    cancelFitsPreviewRequest() {
+      if (this.fitsPreviewController) {
+        this.fitsPreviewController.abort();
+        this.fitsPreviewController = null;
+      }
+    },
+    releaseFitsImageUrl() {
+      if (this.fitsImageUrl) {
+        window.URL.revokeObjectURL(this.fitsImageUrl);
+        this.fitsImageUrl = '';
+      }
+    },
+    handleFitsDialogClosed() {
+      this.cancelFitsPreviewRequest();
+      this.releaseFitsImageUrl();
+      this.fitsImageLoading = false;
+      this.fitsPreviewError = '';
+      this.currentFitsRow = null;
+      this.currentFitsName = '';
     },
     handleFileDownload(row) {
       this.$confirm(`您确定要下载文件: ${row.fitName || row.pwd.split('/').pop()} 吗?`, '下载确认', {
@@ -300,8 +339,9 @@ export default {
       return cellValue;
     }
   },
-  created() {
-    this.fetchSelectOptions();
+  beforeDestroy() {
+    this.cancelFitsPreviewRequest();
+    this.releaseFitsImageUrl();
   }
 }
 </script>
@@ -358,14 +398,70 @@ export default {
   border-top: 1px solid #ebeef5;
 }
 
-.edit-form-container {
-  max-height: 70vh;
-  overflow-y: auto;
+.fits-image-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 52vh;
+  max-height: 66vh;
+  overflow: auto;
+  padding: 16px;
+  box-sizing: border-box;
+  background: #101318;
+  border: 1px solid #dcdfe6;
+  border-radius: 6px;
 }
 
-.fits-image-container {
-  text-align: center;
-  min-height: 200px;
+.fits-dialog-title {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-width: 0;
+}
+
+.fits-dialog-filename {
+  overflow: hidden;
+  color: #909399;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fits-preview-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.fits-zoom-label {
+  min-width: 42px;
+  color: #606266;
+  font-size: 12px;
+  text-align: right;
+}
+
+.fits-preview-image {
+  display: block;
+  max-width: none;
+  height: auto;
+  transform-origin: center center;
+  transition: width 0.18s ease, transform 0.18s ease;
+}
+
+.fits-preview-error {
+  color: #c0c4cc;
+}
+
+.fits-preview-error i {
+  font-size: 48px;
+}
+
+.fits-preview-error p {
+  margin: 12px 0 16px;
 }
 
 .file-link {
@@ -384,6 +480,18 @@ export default {
   margin-top: 10px;
   font-size: 12px;
   color: #909399;
+}
+
+@media (max-width: 768px) {
+  .fits-preview-toolbar {
+    align-items: flex-end;
+    flex-direction: column;
+  }
+
+  .fits-image-container {
+    min-height: 45vh;
+    padding: 8px;
+  }
 }
 
 /* 紧凑的按钮样式 */
