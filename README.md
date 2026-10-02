@@ -37,6 +37,9 @@ astrodc/
 
 Windows 自动恢复任务应指向总目录的 `scripts/start-backend.ps1`，工作目录设为 `backend`。
 
-## 迁移备份
+## 电脑启动与健康检查
 
-原启动配置及旧前端副本保存在忽略目录 `.migration/`。旧前端路径是指向 frontend 的兼容链接；旧后端目录因当前开发软件占用，暂保留作回退备份。运行中的后端和恢复任务已使用 backend 新路径。后续开发和 Git 操作请打开 astrodc 总目录；关闭旧目录的占用软件后可再清理旧后端备份。
+后端自动恢复计划任务、Cloudflare Tunnel 开机入口及 PowerShell 的 `on/off` 命令均使用本仓库 `scripts/` 中的脚本。
+执行 `npm run check:health` 可检查本机后端、线上前端、Cloudflare Tunnel 与 API，并确认后端运行目录属于本仓库。
+执行 `npm run tunnel` 可启动已有隧道；凭据和配置仍保存在用户的 `.cloudflared` 目录，不提交到 Git。
+旧 GitHub 前后端仓库保留历史，本机统一只维护 astrodc。Cloudflare 新部署继续暂停。

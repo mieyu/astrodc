@@ -11,6 +11,8 @@
     "build:backend": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/backend.ps1 -Task package",
     "test:frontend": "node scripts/test-frontend.cjs",
     "test:backend": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/backend.ps1 -Task test",
-    "deploy": "node scripts/deploy-frontend.cjs"
+    "deploy": "node scripts/deploy-frontend.cjs",
+    "check:health": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/check-health.ps1",
+    "tunnel": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/start-tunnel.ps1"
   }
 }
