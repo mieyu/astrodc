@@ -22,7 +22,7 @@ const context = { module: { exports: {} }, axios, mobileViewport: {}, AbortContr
 vm.runInNewContext(source, context, { filename: file });
 const definition = context.module.exports;
 function create() {
-  const instance = { ...definition.data(), visible: true, query: {object:'U0',exptime:60}, focus: {},
+  const instance = { ...definition.data(), visible: true, query: {object:'U0',exptime:60},
     $nextTick: () => Promise.resolve() };
   for (const [name, method] of Object.entries(definition.methods)) instance[name] = method.bind(instance);
   for (const [name, getter] of Object.entries(definition.computed)) Object.defineProperty(instance, name, {get: getter.bind(instance)});
@@ -42,10 +42,14 @@ const prepared = {token:'download-token',filename:'astrodc_U0.zip',fileCount:12,
 (async () => {
   handler = async () => ({data:{code:1,data:{groups,ungroupedCount:1}}});
   const instance = create();
-  instance.focus = {object:'U0',dateObs:'2024-11-03 08:00:00',tele:'T1'};
   await instance.loadGroups();
   assert.equal(requests[0].url, '/api/image/own/downloads/groups');
+  assert.equal(instance.filteredGroups.length,2);
+  assert.equal(instance.selectedGroups.length,0);
+  instance.dates = ['2024-11-03', '2024-11-03'];
+  instance.telescope = 'T1';
   assert.equal(instance.filteredGroups.length,1);
+  instance.selectFiltered();
   assert.equal(instance.selectedGroups[0].id,'u1');
   assert.equal(instance.matchedOnly,false);
   assert.equal(instance.includeCalibration,false);
@@ -104,5 +108,6 @@ const prepared = {token:'download-token',filename:'astrodc_U0.zip',fileCount:12,
   assert.match(table,/导出信息 CSV/);
   assert.match(table,/\/metadata\/export/);
   assert.match(table,/image-download-dialog/);
+  assert.doesNotMatch(table,/下载当日|openDownloads\(scope\.row\)|downloadFocus/);
   console.log('Image download behavior: day selection, calibration, exact-query mode, missing files, native download and cancellation passed.');
 })().catch(error=>{console.error(error);process.exitCode=1});

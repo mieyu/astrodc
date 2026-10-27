@@ -16,7 +16,7 @@
       </div>
     </div>
 
-    <image-download-dialog :visible="downloadsVisible" :query="searchQuery" :focus="downloadFocus"
+    <image-download-dialog :visible="downloadsVisible" :query="searchQuery"
                            @close="downloadsVisible = false" />
     <el-table
         :data="tableData"
@@ -33,10 +33,9 @@
           <a href="#" @click.prevent="handleFileDownload(scope.row)" class="file-link">{{ scope.row.pwd }}</a>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="190" align="center">
+      <el-table-column label="操作" width="90" align="center">
         <template slot-scope="scope">
-                    <el-button size="mini" type="success" plain @click="handlePreview(scope.row)">预览</el-button>
-          <el-button size="mini" type="primary" plain @click="openDownloads(scope.row)">下载当日</el-button>
+          <el-button size="mini" type="success" plain @click="handlePreview(scope.row)">预览</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="fitName" label="FIT-NAME" width="130" sortable="custom" :formatter="cellFormatter" show-overflow-tooltip></el-table-column>
@@ -145,7 +144,6 @@ export default {
   data() {
     return {
       downloadsVisible: false,
-      downloadFocus: {},
       tableData: [],
       loading: false,
       currentPage: 1,
@@ -188,8 +186,7 @@ export default {
     goBack() {
       this.$router.go(-1);
     },
-    openDownloads(row) {
-      this.downloadFocus = row || {};
+    openDownloads() {
       this.downloadsVisible = true;
     },
     async exportMetadata() {

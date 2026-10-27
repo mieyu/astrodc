@@ -80,7 +80,7 @@ import mobileViewport from '../mixins/mobileViewport';
 export default {
   name: 'ImageDownloadDialog',
   mixins: [mobileViewport],
-  props: { visible: Boolean, query: { type: Object, default: () => ({}) }, focus: { type: Object, default: () => ({}) } },
+  props: { visible: Boolean, query: { type: Object, default: () => ({}) } },
   data() {
     return {
       groups: [], selectedGroups: [], ungroupedCount: 0, dates: null, target: '', telescope: '',
@@ -110,9 +110,8 @@ export default {
         if (response.data.code !== 1) throw new Error(response.data.message || '整理观测日失败');
         this.groups = response.data.data.groups;
         this.ungroupedCount = response.data.data.ungroupedCount;
-        this.target = this.focus.object || '';
-        this.telescope = this.focus.tele || '';
-        this.dates = this.focus.dateObs ? [this.focus.dateObs.slice(0, 10), this.focus.dateObs.slice(0, 10)] : null;
+        this.target = this.query.object || '';
+        this.telescope = this.query.tele || '';
         if (this.filteredGroups.length === 1) {
           await this.$nextTick();
           this.$refs.groups.toggleRowSelection(this.filteredGroups[0], true);
