@@ -67,7 +67,7 @@ public class FileServiceImpl implements FileService {
         try {
             Path path = resolvePath(filePath);
             Resource resource = new UrlResource(path.toUri());
-            if (resource.exists() || resource.isReadable()) {
+            if (Files.isRegularFile(path) && resource.exists() && resource.isReadable()) {
                 return resource;
             } else {
                 throw new RuntimeException("文件不存在或无法读取: " + filePath);
@@ -85,7 +85,24 @@ public class FileServiceImpl implements FileService {
         if (!targetPath.startsWith(this.fileStorageLocation)) {
             throw new RuntimeException("非法路径访问尝试: " + filePath);
         }
+        try {
+            Path realRoot = fileStorageLocation.toRealPath();
+            Path ancestor = targetPath;
+            while (ancestor != null && !Files.exists(ancestor, java.nio.file.LinkOption.NOFOLLOW_LINKS)) {
+                ancestor = ancestor.getParent();
+            }
+            if (ancestor == null || !ancestor.toRealPath().startsWith(realRoot)) {
+                throw new RuntimeException("非法路径访问尝试: " + filePath);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("文件路径无法读取", e);
+        }
         return targetPath;
+    }
+
+    @Override
+    public String storageRelativePath(String filePath) {
+        return fileStorageLocation.relativize(resolvePath(filePath)).toString();
     }
 
     /**

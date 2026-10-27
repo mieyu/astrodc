@@ -16,7 +16,11 @@ function Invoke-AstroControl {
     }
     & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'start-backend.ps1')
     if ($LASTEXITCODE -ne 0) { throw 'Backend startup failed.' }
-    if (-not (Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue)) {
+    $client = New-Object System.Net.Sockets.TcpClient
+    try { $client.Connect('localhost', 8080); $frontendRunning = $true }
+    catch { $frontendRunning = $false }
+    finally { $client.Dispose() }
+    if (-not $frontendRunning) {
       $runtimeDir = Join-Path $rootDir '.runtime'
       New-Item -ItemType Directory -Path $runtimeDir -Force | Out-Null
       $process = Start-Process -FilePath 'npm.cmd' -ArgumentList 'run serve -- --host localhost --port 8080' -WorkingDirectory (Join-Path $rootDir 'frontend') -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $runtimeDir 'frontend.out.log') -RedirectStandardError (Join-Path $runtimeDir 'frontend.err.log')

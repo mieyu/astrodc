@@ -26,4 +26,5 @@ public interface FileService {
      * @return Path 对象
      */
     Path resolvePath(String filePath);
+    String storageRelativePath(String filePath);
 }

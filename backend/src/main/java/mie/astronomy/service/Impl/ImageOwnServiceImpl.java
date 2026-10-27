@@ -14,6 +14,7 @@ import mie.astronomy.service.ImageOwnService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +95,13 @@ public class ImageOwnServiceImpl extends ServiceImpl<ImageOwnMapper, ImageOwn> i
         return baseMapper.selectList(wrapper);
     }
 
+    @Override
+    public List<ImageOwn> listDownloadMetadata(LocalDateTime from, LocalDateTime to) {
+        return baseMapper.selectList(new LambdaQueryWrapper<ImageOwn>()
+                .select(ImageOwn::getPwd, ImageOwn::getDateObs, ImageOwn::getObject,
+                        ImageOwn::getTele, ImageOwn::getImagetyp)
+                .ge(ImageOwn::getDateObs, from).lt(ImageOwn::getDateObs, to));
+    }
     private void buildQueryConditions(LambdaQueryWrapper<ImageOwn> wrapper, ImageOwnQueryDto query) {
         wrapper.like(StringUtils.isNotBlank(query.getPwd()), ImageOwn::getPwd, query.getPwd());
         wrapper.like(StringUtils.isNotBlank(query.getFitName()), ImageOwn::getFitName, query.getFitName());

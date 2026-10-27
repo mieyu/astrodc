@@ -6,13 +6,18 @@
         <span>返回上一页</span>
       </button>
       <div class="app-back-actions">
-        <button type="button" class="app-back-button app-back-secondary" @click="download">
+        <button type="button" class="app-back-button app-back-secondary" @click="exportMetadata">
+          <i class="el-icon-document"></i><span>导出信息 CSV</span>
+        </button>
+        <button type="button" class="app-back-button app-back-secondary" @click="openDownloads()">
           <i class="el-icon-download"></i>
-          <span>下载</span>
+          <span>批量下载原始 FITS</span>
         </button>
       </div>
     </div>
 
+    <image-download-dialog :visible="downloadsVisible" :query="searchQuery" :focus="downloadFocus"
+                           @close="downloadsVisible = false" />
     <el-table
         :data="tableData"
         border
@@ -28,9 +33,10 @@
           <a href="#" @click.prevent="handleFileDownload(scope.row)" class="file-link">{{ scope.row.pwd }}</a>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="90" align="center">
+      <el-table-column label="操作" width="190" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" type="success" plain @click="handlePreview(scope.row)">预览</el-button>
+                    <el-button size="mini" type="success" plain @click="handlePreview(scope.row)">预览</el-button>
+          <el-button size="mini" type="primary" plain @click="openDownloads(scope.row)">下载当日</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="fitName" label="FIT-NAME" width="130" sortable="custom" :formatter="cellFormatter" show-overflow-tooltip></el-table-column>
@@ -128,14 +134,18 @@
 </template>
 
 <script>
+import ImageDownloadDialog from './ImageDownloadDialog.vue';
 import mobileViewport from '../mixins/mobileViewport';
 import axios from "axios";
 
 export default {
   mixins: [mobileViewport],
   name: 'TableList',
+  components: { ImageDownloadDialog },
   data() {
     return {
+      downloadsVisible: false,
+      downloadFocus: {},
       tableData: [],
       loading: false,
       currentPage: 1,
@@ -166,6 +176,7 @@ export default {
   watch: {
     '$route.query': {
       handler(newQuery) {
+        this.downloadsVisible = false;
         this.currentPage = 1;
         this.searchQuery = newQuery;
         this.fetchData();
@@ -177,10 +188,14 @@ export default {
     goBack() {
       this.$router.go(-1);
     },
-    async download() {
-      this.$message.info("正在准备下载文件，请稍候...");
+    openDownloads(row) {
+      this.downloadFocus = row || {};
+      this.downloadsVisible = true;
+    },
+    async exportMetadata() {
+      this.$message.info("正在导出查询结果信息 CSV，请稍候...");
       try {
-        const response = await axios.post('/api/image/own/download', this.searchQuery, { responseType: 'blob' });
+        const response = await axios.post('/api/image/own/metadata/export', this.searchQuery, { responseType: 'blob' });
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
@@ -317,7 +332,7 @@ export default {
       this.currentFitsName = '';
     },
     handleFileDownload(row) {
-      this.$confirm(`您确定要下载文件: ${row.fitName || row.pwd.split('/').pop()} 吗?`, '下载确认', {
+      this.$confirm(`您确定要下载单个原始 FITS 文件: ${row.fitName || row.pwd.split('/').pop()} 吗?`, '下载确认', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'info'

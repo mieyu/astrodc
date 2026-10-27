@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import mie.astronomy.dto.ImageOwnQueryDto;
 import mie.astronomy.entity.ImageOwn;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ public interface ImageOwnService extends IService<ImageOwn> {
     Map<String, List<Object>> getDropdownOptions();
 
     List<ImageOwn> listByQuery(ImageOwnQueryDto query);
+    List<ImageOwn> listDownloadMetadata(LocalDateTime from, LocalDateTime to);
 
     IPage<ImageOwn> search(ImageOwnQueryDto query, long pageNum, long pageSize, String sortField, String sortOrder);
 
